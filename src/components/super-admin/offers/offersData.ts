@@ -1,0 +1,178 @@
+export type Offer = {
+  id: string;
+  name: string;
+  subtitle: string;
+  type: "Coupon" | "Percentage";
+  discount: string;
+  discountNote: string;
+  period: string;
+  duration: string;
+  orders: number;
+  revenue: number;
+  status: "Active" | "Completed" | "Scheduled";
+};
+
+export const OFFERS: Offer[] = [
+  {
+    id: "OFF-1",
+    name: "FESTIVE20",
+    subtitle: "Festival Special Offer",
+    type: "Coupon",
+    discount: "20% OFF",
+    discountNote: "Above ₹999",
+    period: "May 15 – Jun 15",
+    duration: "31 days",
+    orders: 1240,
+    revenue: 102450,
+    status: "Active",
+  },
+  {
+    id: "OFF-2",
+    name: "HEALTHY10",
+    subtitle: "Health & Wellness Offer",
+    type: "Coupon",
+    discount: "10% OFF",
+    discountNote: "Above ₹499",
+    period: "May 15 – Jun 15",
+    duration: "31 days",
+    orders: 892,
+    revenue: 48760,
+    status: "Active",
+  },
+  {
+    id: "OFF-3",
+    name: "SUMMER SALE",
+    subtitle: "Summer Special Discount",
+    type: "Coupon",
+    discount: "15% OFF",
+    discountNote: "Sitewide",
+    period: "May 15 – Jun 15",
+    duration: "31 days",
+    orders: 618,
+    revenue: 32840,
+    status: "Completed",
+  },
+  {
+    id: "OFF-4",
+    name: "RICE DAY OFFER",
+    subtitle: "National Rice Day",
+    type: "Coupon",
+    discount: "Flat ₹100 OFF",
+    discountNote: "Above ₹799",
+    period: "May 15 – Jun 15",
+    duration: "31 days",
+    orders: 236,
+    revenue: 18320,
+    status: "Active",
+  },
+  {
+    id: "OFF-5",
+    name: "EARLY BIRD",
+    subtitle: "Weekend Early Bird Offer",
+    type: "Coupon",
+    discount: "5% OFF",
+    discountNote: "Above ₹399",
+    period: "May 15 – Jun 15",
+    duration: "31 days",
+    orders: 196,
+    revenue: 12390,
+    status: "Scheduled",
+  },
+  {
+    id: "OFF-6",
+    name: "MONSOON20",
+    subtitle: "Monsoon Season Offer",
+    type: "Percentage",
+    discount: "20% OFF",
+    discountNote: "Above ₹599",
+    period: "Jun 1 – Jun 30",
+    duration: "30 days",
+    orders: 340,
+    revenue: 21500,
+    status: "Active",
+  },
+  {
+    id: "OFF-7",
+    name: "NEWUSER15",
+    subtitle: "New Customer Welcome",
+    type: "Percentage",
+    discount: "15% OFF",
+    discountNote: "First order",
+    period: "Jun 1 – Jul 31",
+    duration: "61 days",
+    orders: 505,
+    revenue: 27600,
+    status: "Active",
+  },
+  {
+    id: "OFF-8",
+    name: "BULKBUY",
+    subtitle: "Bulk Purchase Discount",
+    type: "Percentage",
+    discount: "12% OFF",
+    discountNote: "Above ₹2999",
+    period: "Apr 1 – Apr 30",
+    duration: "30 days",
+    orders: 128,
+    revenue: 45200,
+    status: "Completed",
+  },
+  {
+    id: "OFF-9",
+    name: "ONAM SPECIAL",
+    subtitle: "Onam Festival Offer",
+    type: "Coupon",
+    discount: "25% OFF",
+    discountNote: "Above ₹1499",
+    period: "Aug 20 – Sep 10",
+    duration: "21 days",
+    orders: 0,
+    revenue: 0,
+    status: "Scheduled",
+  },
+  {
+    id: "OFF-10",
+    name: "FREESHIP",
+    subtitle: "Free Shipping Weekend",
+    type: "Percentage",
+    discount: "Free Shipping",
+    discountNote: "Above ₹499",
+    period: "May 1 – May 31",
+    duration: "31 days",
+    orders: 764,
+    revenue: 38900,
+    status: "Completed",
+  },
+  {
+    id: "OFF-11",
+    name: "LOYALTY10",
+    subtitle: "Loyalty Member Discount",
+    type: "Coupon",
+    discount: "10% OFF",
+    discountNote: "Members only",
+    period: "Jun 15 – Jul 15",
+    duration: "30 days",
+    orders: 312,
+    revenue: 19800,
+    status: "Active",
+  },
+  {
+    id: "OFF-12",
+    name: "REFERRAL",
+    subtitle: "Refer a Friend Offer",
+    type: "Percentage",
+    discount: "₹150 OFF",
+    discountNote: "Per referral",
+    period: "Jun 1 – Aug 31",
+    duration: "91 days",
+    orders: 89,
+    revenue: 13400,
+    status: "Active",
+  },
+];
+
+export function statusPillClasses(status: Offer["status"]) {
+  if (status === "Active") return "bg-[#EBF7EC] text-[#22C55E]";
+  if (status === "Scheduled") return "bg-[#EFF6FF] text-[#3B82F6]";
+  return "bg-[#F3F4F6] text-[#6B7280]";
+}

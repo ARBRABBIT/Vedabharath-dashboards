@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1440, height: 750 } });
+await page.goto("http://localhost:3000/dashboard");
+await page.waitForTimeout(300);
+await page.screenshot({ path: "swing-frame1.png", clip: { x: 970, y: 470, width: 470, height: 300 } });
+await page.waitForTimeout(1200);
+await page.screenshot({ path: "swing-frame2.png", clip: { x: 970, y: 470, width: 470, height: 300 } });
+await page.waitForTimeout(1200);
+await page.screenshot({ path: "swing-frame3.png", clip: { x: 970, y: 470, width: 470, height: 300 } });
+await browser.close();

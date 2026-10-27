@@ -58,32 +58,33 @@ export default function CouponsPage() {
           subtitle="Add all the basic details of your new rice product"
           backHref="/super-admin/master-data"
           right={
-            <button
-              type="button"
-              onClick={() => setCreateOpen(true)}
-              className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              <Plus className="h-4 w-4" strokeWidth={2.5} />
-              Add New Coupon
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Search Coupons"
+                  className="w-[220px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-11 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E] sm:w-[260px]"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setCreateOpen(true)}
+                className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+                Add New Coupon
+              </button>
+            </div>
           }
         />
 
-        <div className="relative mt-6">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
-          <input
-            type="text"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
-            }}
-            placeholder="Search Coupons"
-            className="w-full rounded-full border border-[#E5E7EB] bg-white py-3 pl-11 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-          />
-        </div>
-
-        <div className="mt-5 flex flex-col gap-3">
+        <div className="mt-6 flex flex-col gap-3">
           <div className="flex items-center px-6 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
             <span className="flex-1">Coupon Code</span>
             <span className="w-[220px]">Discount</span>

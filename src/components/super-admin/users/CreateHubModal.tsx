@@ -159,18 +159,18 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
             )}
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-6 border-t border-[#F3F4F6] pt-5">
+          <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#F3F4F6] pt-5">
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer text-sm font-bold text-[#EF4444] hover:opacity-80"
+              className="cursor-pointer rounded-full border border-[#E5E7EB] bg-white px-7 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB] hover:text-black"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleCreate}
-              className="cursor-pointer rounded-full bg-[#F7931E] px-10 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+              className="cursor-pointer rounded-full bg-[#F7931E] px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
             >
               {initial ? "Save" : "Create"}
             </button>

@@ -3,50 +3,44 @@
 import { Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
-import { FormModal } from "@/components/super-admin/masterdata/FormModal";
-import { INITIAL_COUPONS, type Coupon } from "@/components/super-admin/masterdata/masterDataData";
+import { EditOfferModal } from "@/components/super-admin/offers/EditOfferModal";
+import { LaunchOfferModal } from "@/components/super-admin/offers/LaunchOfferModal";
+import { OFFERS, statusPillClasses, type Offer } from "@/components/super-admin/offers/offersData";
+import { FilterDropdown } from "@/components/super-admin/ui/FilterDropdown";
 import { PageHeader } from "@/components/super-admin/ui/PageHeader";
 import { Pagination } from "@/components/super-admin/ui/Pagination";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
+type Tab = "Percentage" | "Coupon" | "Drafts";
+type StatusFilter = "All Statuses" | Offer["status"];
 
 export default function CouponsPage() {
-  const [coupons, setCoupons] = useState(INITIAL_COUPONS);
+  const [offers, setOffers] = useState<Offer[]>(OFFERS);
+  const [tab, setTab] = useState<Tab>("Coupon");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("All Statuses");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [launchOpen, setLaunchOpen] = useState(false);
+  const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
 
-  const filtered = useMemo(
-    () => coupons.filter((coupon) => coupon.code.toLowerCase().includes(search.toLowerCase())),
-    [coupons, search],
-  );
-  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  function handleSubmit(values: Record<string, string>) {
-    if (!values.code?.trim()) return;
-    const rawDiscount = values.discount ? values.discount.replace(/[^0-9]/g, "").slice(0, 2) : "";
-    const formattedDiscount = rawDiscount ? `${rawDiscount}% OFF` : (editingCoupon?.discount ?? "50% OFF");
-
-    if (editingCoupon) {
-      setCoupons((prev) =>
-        prev.map((coupon) =>
-          coupon.id === editingCoupon.id ? { ...coupon, code: values.code, discount: formattedDiscount } : coupon,
-        ),
-      );
-    } else {
-      setCoupons((prev) => [
-        {
-          id: `c${prev.length + 1}-${Date.now()}`,
-          code: values.code,
-          subtitle: "New campaign",
-          discount: formattedDiscount,
-          maxDiscount: "Max discount ₹500",
-        },
-        ...prev,
-      ]);
-    }
+  function handleSaveOffer(updated: Offer) {
+    setOffers((prev) => prev.map((offer) => (offer.id === updated.id ? updated : offer)));
   }
+
+  const filtered = useMemo(() => {
+    return offers.filter((offer) => {
+      const matchesTab = tab === "Drafts" ? false : offer.type === tab;
+      const matchesStatus = statusFilter === "All Statuses" ? true : offer.status === statusFilter;
+      const matchesSearch =
+        offer.name.toLowerCase().includes(search.toLowerCase()) ||
+        offer.subtitle.toLowerCase().includes(search.toLowerCase()) ||
+        offer.discount.toLowerCase().includes(search.toLowerCase());
+      return matchesTab && matchesStatus && matchesSearch;
+    });
+  }, [offers, tab, statusFilter, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#F5F5F7]">
@@ -55,106 +49,160 @@ export default function CouponsPage() {
       <main className="flex-1 px-6 pb-10 pt-6 sm:px-10 lg:px-16">
         <PageHeader
           title="Coupons"
-          subtitle="Add all the basic details of your new rice product"
+          subtitle="Track the performance of all your marketing campaigns and offers"
           backHref="/super-admin/master-data"
           right={
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(event) => {
-                    setSearch(event.target.value);
-                    setPage(1);
-                  }}
-                  placeholder="Search Coupons"
-                  className="w-[220px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-11 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E] sm:w-[260px]"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setCreateOpen(true)}
-                className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Add New Coupon
-              </button>
+            <div className="rounded-full border border-[#E5E7EB] bg-white">
+              <FilterDropdown
+                value={statusFilter}
+                onChange={(value) => {
+                  setStatusFilter(value as StatusFilter);
+                  setPage(1);
+                }}
+                options={[
+                  { value: "All Statuses", label: "All Statuses" },
+                  { value: "Active", label: "Active" },
+                  { value: "Scheduled", label: "Scheduled" },
+                  { value: "Completed", label: "Completed" },
+                ]}
+              />
             </div>
           }
         />
 
-        <div className="mt-6 flex flex-col gap-3">
-          <div className="flex items-center px-6 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-            <span className="flex-1">Coupon Code</span>
-            <span className="w-[220px]">Discount</span>
-            <span className="w-[100px] text-right">Actions</span>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-1 rounded-full bg-white p-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+            {(["Percentage", "Coupon", "Drafts"] as Tab[]).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => {
+                  setTab(option);
+                  setPage(1);
+                }}
+                className={`cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                  tab === option ? "bg-[#F7931E] text-white" : "text-[#374151] hover:text-black"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
           </div>
-          {pageItems.map((coupon) => (
-            <div key={coupon.id} className="flex items-center rounded-2xl border-2 border-black/[0.04] bg-white px-6 py-5">
-              <div className="flex-1">
-                <p className="text-base font-bold text-black">{coupon.code}</p>
-                <p className="text-sm text-[#9CA3AF]">{coupon.subtitle}</p>
-              </div>
-              <div className="w-[220px]">
-                <p className="text-sm font-semibold text-black">{coupon.discount}</p>
-                <p className="text-sm text-[#9CA3AF]">{coupon.maxDiscount}</p>
-              </div>
-              <div className="w-[100px] text-right">
-                <button
-                  type="button"
-                  onClick={() => setEditingCoupon(coupon)}
-                  className="cursor-pointer rounded-full border border-[#F7931E] px-4 py-1.5 text-xs font-semibold text-[#F7931E] transition-colors hover:bg-[#FEF3E2]"
-                >
-                  Edit
-                </button>
-              </div>
+
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+              <input
+                type="text"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search..."
+                className="w-[200px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-11 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+              />
             </div>
-          ))}
+            <button
+              type="button"
+              onClick={() => setLaunchOpen(true)}
+              className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              <Plus className="h-4 w-4" strokeWidth={2.5} />
+              New Offer
+            </button>
+          </div>
         </div>
 
-        <div className="mt-5">
-          <Pagination
-            page={page}
-            totalPages={Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))}
-            totalItems={filtered.length}
-            pageSize={PAGE_SIZE}
-            itemLabel="coupons"
-            onPageChange={setPage}
-          />
+        <div className="mt-5 overflow-hidden rounded-[32px] border-2 border-black/[0.04] bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px]">
+              <thead>
+                <tr className="border-b border-[#F3F4F6] text-left text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                  <th className="px-6 py-4">Campaign</th>
+                  <th className="px-4 py-4">Type</th>
+                  <th className="px-4 py-4">Discount</th>
+                  <th className="px-4 py-4">Period</th>
+                  <th className="px-4 py-4">Orders</th>
+                  <th className="px-4 py-4">Revenue</th>
+                  <th className="px-4 py-4">Status</th>
+                  <th className="px-4 py-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageItems.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-10 text-center text-sm text-[#9CA3AF]">
+                      No coupons found.
+                    </td>
+                  </tr>
+                )}
+                {pageItems.map((offer) => (
+                  <tr key={offer.id} className="border-b border-[#F3F4F6] last:border-none">
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-semibold text-black">{offer.name}</p>
+                      <p className="text-xs text-[#9CA3AF]">{offer.subtitle}</p>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="inline-flex rounded-full bg-[#EBF7EC] px-2.5 py-1 text-xs font-semibold text-[#22C55E]">
+                        {offer.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <p className="text-sm font-bold text-black">{offer.discount}</p>
+                      <p className="text-xs text-[#9CA3AF]">{offer.discountNote}</p>
+                    </td>
+                    <td className="px-4 py-4">
+                      <p className="text-sm text-black">{offer.period}</p>
+                      <p className="text-xs text-[#9CA3AF]">{offer.duration}</p>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-black">{offer.orders.toLocaleString()}</td>
+                    <td className="px-4 py-4 text-sm text-black">₹{offer.revenue.toLocaleString()}</td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusPillClasses(offer.status)}`}
+                      >
+                        {offer.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setEditingOffer(offer)}
+                        className="cursor-pointer rounded-full border border-[#E5E7EB] px-4 py-1.5 text-xs font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
+                      >
+                        Edit Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="border-t border-[#F3F4F6] px-6 py-4">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalItems={filtered.length}
+              pageSize={PAGE_SIZE}
+              itemLabel="campaigns"
+              onPageChange={setPage}
+            />
+          </div>
         </div>
       </main>
 
-      <FormModal
-        open={createOpen || editingCoupon !== null}
-        onClose={() => {
-          setCreateOpen(false);
-          setEditingCoupon(null);
-        }}
-        title="Coupons"
-        fields={[
-          { key: "code", label: "Coupons Code", type: "text", placeholder: "FEUDU87", required: true },
-          {
-            key: "discount",
-            label: "Discount",
-            type: "text",
-            placeholder: "50",
-            suffix: "% off",
-            numericOnly: true,
-            maxLength: 2,
-            required: true,
-          },
-        ]}
-        initialValues={
-          editingCoupon
-            ? {
-                code: editingCoupon.code,
-                discount: editingCoupon.discount.replace(/[^0-9]/g, "").slice(0, 2),
-              }
-            : undefined
-        }
-        submitLabel="Create coupons"
-        onSubmit={handleSubmit}
+      <LaunchOfferModal
+        open={launchOpen}
+        onClose={() => setLaunchOpen(false)}
+      />
+
+      <EditOfferModal
+        offer={editingOffer}
+        open={editingOffer !== null}
+        onClose={() => setEditingOffer(null)}
+        onSave={handleSaveOffer}
       />
     </div>
   );

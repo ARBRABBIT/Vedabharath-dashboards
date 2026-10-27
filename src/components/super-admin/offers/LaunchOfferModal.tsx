@@ -392,9 +392,14 @@ export function LaunchOfferModal({ open, onClose }: LaunchOfferModalProps) {
               <label className="text-xs font-semibold text-[#374151]">Discount Value</label>
               <div className="relative mt-1.5">
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={2}
                   value={discountValue}
-                  onChange={(event) => setDiscountValue(event.target.value)}
+                  onChange={(event) => {
+                    const val = event.target.value.replace(/[^0-9]/g, "").slice(0, 2);
+                    setDiscountValue(val);
+                  }}
                   placeholder="e.g. 20"
                   className={`w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-[#F7931E] ${
                     errors.discountValue ? "border-[#EF4444]" : "border-[#E5E7EB]"

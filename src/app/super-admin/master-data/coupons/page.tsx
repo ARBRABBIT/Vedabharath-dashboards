@@ -25,10 +25,13 @@ export default function CouponsPage() {
 
   function handleSubmit(values: Record<string, string>) {
     if (!values.code?.trim()) return;
+    const rawDiscount = values.discount ? values.discount.replace(/[^0-9]/g, "").slice(0, 2) : "";
+    const formattedDiscount = rawDiscount ? `${rawDiscount}% OFF` : (editingCoupon?.discount ?? "50% OFF");
+
     if (editingCoupon) {
       setCoupons((prev) =>
         prev.map((coupon) =>
-          coupon.id === editingCoupon.id ? { ...coupon, code: values.code, discount: values.discount ?? coupon.discount } : coupon,
+          coupon.id === editingCoupon.id ? { ...coupon, code: values.code, discount: formattedDiscount } : coupon,
         ),
       );
     } else {
@@ -37,7 +40,7 @@ export default function CouponsPage() {
           id: `c${prev.length + 1}-${Date.now()}`,
           code: values.code,
           subtitle: "New campaign",
-          discount: values.discount ?? "50% off",
+          discount: formattedDiscount,
           maxDiscount: "Max discount ₹500",
         },
         ...prev,
@@ -129,10 +132,26 @@ export default function CouponsPage() {
         }}
         title="Coupons"
         fields={[
-          { key: "code", label: "Coupons Code", type: "text", placeholder: "FEUDU87" },
-          { key: "discount", label: "Discount", type: "text", placeholder: "50% off" },
+          { key: "code", label: "Coupons Code", type: "text", placeholder: "FEUDU87", required: true },
+          {
+            key: "discount",
+            label: "Discount",
+            type: "text",
+            placeholder: "50",
+            suffix: "% off",
+            numericOnly: true,
+            maxLength: 2,
+            required: true,
+          },
         ]}
-        initialValues={editingCoupon ? { code: editingCoupon.code, discount: editingCoupon.discount } : undefined}
+        initialValues={
+          editingCoupon
+            ? {
+                code: editingCoupon.code,
+                discount: editingCoupon.discount.replace(/[^0-9]/g, "").slice(0, 2),
+              }
+            : undefined
+        }
         submitLabel="Create coupons"
         onSubmit={handleSubmit}
       />

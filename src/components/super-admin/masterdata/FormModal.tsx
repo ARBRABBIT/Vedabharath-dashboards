@@ -12,6 +12,9 @@ export type FormField = {
   type: "text" | "textarea";
   placeholder?: string;
   required?: boolean;
+  maxLength?: number;
+  numericOnly?: boolean;
+  suffix?: string;
 };
 
 type FormModalProps = {
@@ -151,13 +154,33 @@ export function FormModal({ open, onClose, title, helperText, fields, submitLabe
                   className="mt-1.5 w-full resize-none rounded-xl bg-[#F5F5F7] px-4 py-3 text-sm outline-none placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#F7931E]"
                 />
               ) : (
-                <input
-                  type="text"
-                  value={values[field.key] ?? ""}
-                  onChange={(event) => setValues((prev) => ({ ...prev, [field.key]: event.target.value }))}
-                  placeholder={field.placeholder}
-                  className="mt-1.5 w-full rounded-xl bg-[#F5F5F7] px-4 py-3 text-sm outline-none placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#F7931E]"
-                />
+                <div className="relative mt-1.5 flex items-center">
+                  <input
+                    type="text"
+                    inputMode={field.numericOnly ? "numeric" : undefined}
+                    maxLength={field.maxLength}
+                    value={values[field.key] ?? ""}
+                    onChange={(event) => {
+                      let val = event.target.value;
+                      if (field.numericOnly) {
+                        val = val.replace(/[^0-9]/g, "");
+                      }
+                      if (field.maxLength) {
+                        val = val.slice(0, field.maxLength);
+                      }
+                      setValues((prev) => ({ ...prev, [field.key]: val }));
+                    }}
+                    placeholder={field.placeholder}
+                    className={`w-full rounded-xl bg-[#F5F5F7] px-4 py-3 text-sm outline-none placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#F7931E] ${
+                      field.suffix ? "pr-14" : ""
+                    }`}
+                  />
+                  {field.suffix && (
+                    <span className="pointer-events-none absolute right-4 text-sm font-semibold text-[#6B7280]">
+                      {field.suffix}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           ))}

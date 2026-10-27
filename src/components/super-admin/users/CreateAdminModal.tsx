@@ -125,7 +125,7 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
           )}
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-3 border-t border-[#F3F4F6] pt-5">
+        <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#F3F4F6] pt-5">
           <button
             type="button"
             onClick={onClose}

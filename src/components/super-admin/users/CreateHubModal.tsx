@@ -5,8 +5,11 @@ import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ModalShell } from "@/components/orders/modals/ModalShell";
 import type { Admin, Hub } from "@/components/super-admin/users/usersData";
-
-const ZONES = ["North Bangalore", "South Bangalore", "East Bangalore", "Hyderabad", "Secunderabad"];
+import {
+  WAREHOUSE_PRESETS,
+  WarehouseLocationMapModal,
+  WarehouseMapInlinePicker,
+} from "./WarehouseLocationMapModal";
 
 export type HubFormData = {
   name: string;
@@ -25,20 +28,20 @@ type CreateHubModalProps = {
 
 export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: CreateHubModalProps) {
   const [name, setName] = useState("");
-  const [zone, setZone] = useState("");
   const [address, setAddress] = useState("");
   const [adminId, setAdminId] = useState("");
+  const [mapModalOpen, setMapModalOpen] = useState(false);
   const [error, setError] = useState(false);
   const [step, setStep] = useState<"form" | "success">("form");
 
   useEffect(() => {
     if (!open) return;
     setName(initial?.name ?? "");
-    setZone("");
-    setAddress(initial?.facilityAddress ?? "");
+    setAddress(initial?.facilityAddress ?? WAREHOUSE_PRESETS[0].fullAddress);
     setAdminId(admins.find((admin) => admin.hubId === initial?.id)?.id ?? "");
     setError(false);
     setStep("form");
+    setMapModalOpen(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initial]);
 
@@ -47,7 +50,16 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
       setError(true);
       return;
     }
-    onSave({ name: name.trim(), zone: zone || ZONES[0], address: address.trim(), adminId });
+
+    const zoneName = address.toLowerCase().includes("bangalore")
+      ? address.toLowerCase().includes("south") || address.toLowerCase().includes("electronic")
+        ? "South Bangalore"
+        : "North Bangalore"
+      : address.toLowerCase().includes("hyderabad")
+        ? "Hyderabad"
+        : "Regional Hub";
+
+    onSave({ name: name.trim(), zone: zoneName, address: address.trim(), adminId });
     setStep("success");
   }
 
@@ -89,98 +101,93 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
   }
 
   return (
-    <ModalShell open={open} onClose={onClose} maxWidth="max-w-[460px]">
-      <div className="p-6">
-        <h2 className="text-lg font-bold text-black">
-          {initial ? "Edit Distribution Hub" : "Register New Distribution Hub"}
-        </h2>
+    <>
+      <ModalShell open={open} onClose={onClose} maxWidth="max-w-[500px]">
+        <div className="p-6">
+          <h2 className="text-lg font-bold text-black">
+            {initial ? "Edit Distribution Hub" : "Register New Distribution Hub"}
+          </h2>
 
-        <div className="mt-5 flex flex-col gap-4">
-          <div>
-            <label className="text-sm font-semibold text-black">Hub Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="e.g., Whitefield Logistics Center"
-              className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-            />
+          <div className="mt-5 flex flex-col gap-4">
+            <div>
+              <label className="text-sm font-semibold text-black">Hub Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="e.g., Whitefield Logistics Center"
+                className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+              />
+            </div>
+
+            {/* Warehouse Map Location Picker */}
+            <div>
+              <div className="flex items-center justify-between pb-1.5">
+                <label className="text-sm font-semibold text-black">Warehouse Location on Map</label>
+                <button
+                  type="button"
+                  onClick={() => setMapModalOpen(true)}
+                  className="cursor-pointer text-xs font-bold text-[#F7931E] transition-colors hover:underline"
+                >
+                  Enlarge Map
+                </button>
+              </div>
+              <WarehouseMapInlinePicker
+                selectedAddress={address}
+                onOpenEnlarge={() => setMapModalOpen(true)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-black">Full Address</label>
+              <textarea
+                value={address}
+                onChange={(event) => setAddress(event.target.value)}
+                placeholder="e.g., Plot 45, Industrial Area..."
+                rows={3}
+                className="mt-1.5 w-full resize-none rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+              />
+              <p className="mt-1 text-[11px] text-[#9CA3AF]">
+                Pin a location on the map above or edit full address details directly.
+              </p>
+            </div>
+
+            {error && (
+              <p className="rounded-xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#EF4444]">
+                Please fill in Hub Name and Full Address.
+              </p>
+            )}
           </div>
 
-          <div>
-            <label className="text-sm font-semibold text-black">Regional Zone</label>
-            <select
-              value={zone}
-              onChange={(event) => setZone(event.target.value)}
-              className={`mt-1.5 w-full cursor-pointer rounded-xl border border-[#E5E7EB] py-2.5 pl-4 pr-10 text-sm outline-none focus:border-[#F7931E] ${
-                zone ? "text-black" : "text-[#9CA3AF]"
-              }`}
+          <div className="mt-6 flex items-center justify-end gap-6 border-t border-[#F3F4F6] pt-5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="cursor-pointer text-sm font-bold text-[#EF4444] hover:opacity-80"
             >
-              <option value="" disabled>
-                e.g., South Bangalore
-              </option>
-              {ZONES.map((option) => (
-                <option key={option} value={option} className="text-black">
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-black">Select Admin</label>
-            <select
-              value={adminId}
-              onChange={(event) => setAdminId(event.target.value)}
-              className={`mt-1.5 w-full cursor-pointer rounded-xl border border-[#E5E7EB] py-2.5 pl-4 pr-10 text-sm outline-none focus:border-[#F7931E] ${
-                adminId ? "text-black" : "text-[#9CA3AF]"
-              }`}
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleCreate}
+              className="cursor-pointer rounded-full bg-[#F7931E] px-10 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
             >
-              <option value="">Select Admin</option>
-              {admins.map((admin) => (
-                <option key={admin.id} value={admin.id} className="text-black">
-                  {admin.name}
-                </option>
-              ))}
-            </select>
+              {initial ? "Save" : "Create"}
+            </button>
           </div>
-
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Physical Address</p>
-            <label className="mt-2 block text-sm font-semibold text-black">Full Address</label>
-            <textarea
-              value={address}
-              onChange={(event) => setAddress(event.target.value)}
-              placeholder="e.g., Plot 45, Industrial Area..."
-              rows={3}
-              className="mt-1.5 w-full resize-none rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-            />
-          </div>
-
-          {error && (
-            <p className="rounded-xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#EF4444]">
-              Please fill in Hub Name and Full Address.
-            </p>
-          )}
         </div>
+      </ModalShell>
 
-        <div className="mt-6 flex items-center justify-end gap-6 border-t border-[#F3F4F6] pt-5">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cursor-pointer text-sm font-bold text-[#EF4444] hover:opacity-80"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleCreate}
-            className="cursor-pointer rounded-full bg-[#F7931E] px-10 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
-          >
-            {initial ? "Save" : "Create"}
-          </button>
-        </div>
-      </div>
-    </ModalShell>
+      {/* Enlarged Interactive Map Modal */}
+      <WarehouseLocationMapModal
+        open={mapModalOpen}
+        onClose={() => setMapModalOpen(false)}
+        initialAddress={address}
+        onConfirmLocation={(confirmedAddr) => {
+          setAddress(confirmedAddr);
+          setError(false);
+        }}
+      />
+    </>
   );
 }

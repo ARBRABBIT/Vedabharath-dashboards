@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, MapPin, Search } from "lucide-react";
+import { Building2, FileText, MapPin, Search, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
@@ -134,22 +134,25 @@ export default function UserManagementPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/super-admin/users/drafts"
-              className="cursor-pointer rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
+              className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
             >
+              <FileText className="h-4 w-4 text-[#6B7280]" strokeWidth={2} />
               Drafts
             </Link>
             <button
               type="button"
               onClick={() => setCreateHubOpen(true)}
-              className="cursor-pointer whitespace-nowrap rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
+              className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
             >
+              <Building2 className="h-4 w-4 text-[#6B7280]" strokeWidth={2} />
               Create New Hub
             </button>
             <button
               type="button"
               onClick={() => setCreateAdminOpen(true)}
-              className="cursor-pointer whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
             >
+              <UserPlus className="h-4 w-4 text-[#6B7280]" strokeWidth={2} />
               Create Admin
             </button>
           </div>

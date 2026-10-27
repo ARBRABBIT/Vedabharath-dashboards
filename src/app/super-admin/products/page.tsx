@@ -12,20 +12,14 @@ import { Pagination } from "@/components/super-admin/ui/Pagination";
 import { PRODUCTS, performanceTag, stockDotColor, tagPillClasses } from "@/components/super-admin/products/productsData";
 ""
 const PAGE_SIZE = 5;
-type SortMode = "ordered" | "revenue";
 
 export default function TopSellingProductsPage() {
-  const [sortMode, setSortMode] = useState<SortMode>("ordered");
   const [dateRange, setDateRange] = useState("30");
   const [page, setPage] = useState(1);
 
   const sorted = useMemo(() => {
-    const list = [...PRODUCTS];
-    list.sort((a, b) =>
-      sortMode === "ordered" ? b.orders - a.orders : b.price * b.orders - a.price * a.orders,
-    );
-    return list;
-  }, [sortMode]);
+    return [...PRODUCTS].sort((a, b) => b.orders - a.orders);
+  }, []);
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const pageItems = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -40,34 +34,7 @@ export default function TopSellingProductsPage() {
           subtitle="Track product sales, stock availability and active orders."
         />
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1 rounded-full bg-white p-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
-            <button
-              type="button"
-              onClick={() => {
-                setSortMode("ordered");
-                setPage(1);
-              }}
-              className={`cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
-                sortMode === "ordered" ? "bg-[#F7931E] text-white" : "text-[#374151] hover:text-black"
-              }`}
-            >
-              Most Ordered
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSortMode("revenue");
-                setPage(1);
-              }}
-              className={`cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
-                sortMode === "revenue" ? "bg-[#F7931E] text-white" : "text-[#374151] hover:text-black"
-              }`}
-            >
-              Best Revenue
-            </button>
-          </div>
-
+        <div className="mt-6 flex items-center justify-end">
           <div className="rounded-full border border-[#E5E7EB] bg-white">
             <FilterDropdown
               value={dateRange}

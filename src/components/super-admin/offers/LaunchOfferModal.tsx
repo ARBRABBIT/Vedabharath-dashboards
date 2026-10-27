@@ -38,11 +38,12 @@ type LaunchOfferModalProps = {
   open: boolean;
   onClose: () => void;
   defaultOfferType?: OfferType;
+  onLaunch?: (newOffer: any) => void;
 };
 
-export function LaunchOfferModal({ open, onClose, defaultOfferType = "percentage" }: LaunchOfferModalProps) {
+export function LaunchOfferModal({ open, onClose, defaultOfferType = "coupon", onLaunch }: LaunchOfferModalProps) {
   const [step, setStep] = useState<Step>("form");
-  const [offerType, setOfferType] = useState<OfferType>(defaultOfferType);
+  const [offerType, setOfferType] = useState<OfferType>("coupon");
   const [applyTarget, setApplyTarget] = useState<ApplyTarget>("all");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
@@ -81,12 +82,9 @@ export function LaunchOfferModal({ open, onClose, defaultOfferType = "percentage
 
   function handleLaunch() {
     const nextErrors: Record<string, boolean> = {};
-    if (offerType === "percentage") {
-      if (!discountValue.trim()) nextErrors.discountValue = true;
-      if (!maxDiscountValue.trim()) nextErrors.maxDiscountValue = true;
-    } else {
-      if (!coupon) nextErrors.coupon = true;
-    }
+    if (!coupon.trim()) nextErrors.coupon = true;
+    if (!discountValue.trim()) nextErrors.discountValue = true;
+    if (!maxDiscountValue.trim()) nextErrors.maxDiscountValue = true;
     if (!startDate) nextErrors.startDate = true;
     if (!endDate) nextErrors.endDate = true;
 
@@ -95,6 +93,21 @@ export function LaunchOfferModal({ open, onClose, defaultOfferType = "percentage
       return;
     }
     setErrors({});
+    if (onLaunch) {
+      onLaunch({
+        id: `o${Date.now()}`,
+        name: coupon.trim().toUpperCase(),
+        subtitle: "Coupon campaign",
+        type: "Coupon",
+        discount: `${discountValue}% OFF`,
+        discountNote: minOrderValue ? `Above ₹${minOrderValue}` : "Sitewide",
+        period: `${startDate} – ${endDate}`,
+        duration: "Active",
+        orders: 0,
+        revenue: 0,
+        status: "Active",
+      });
+    }
     setStep("success");
   }
 
@@ -349,125 +362,82 @@ export function LaunchOfferModal({ open, onClose, defaultOfferType = "percentage
         <h2 className="text-xl font-bold text-black">Launch Offer</h2>
         <p className="mt-1 text-sm text-[#6B7280]">Create a discount or coupon offer and apply it to products.</p>
 
-        <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-[#9CA3AF]">Offer Type</p>
-        <div className="mt-2 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setOfferType("percentage")}
-            className={`flex cursor-pointer items-start gap-3 rounded-2xl border-2 p-4 text-left transition-colors ${
-              offerType === "percentage" ? "border-[#22C55E] bg-[#F0FDF4]" : "border-[#F3F4F6] bg-white"
-            }`}
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#22C55E] text-white">
-              <Percent className="h-4 w-4" strokeWidth={2.5} />
-            </span>
-            <span>
-              <span className="block text-sm font-semibold text-black">Percentage Discount</span>
-              <span className="block text-xs text-[#9CA3AF]">Offer discount in percentage</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setOfferType("coupon")}
-            className={`flex cursor-pointer items-start gap-3 rounded-2xl border-2 p-4 text-left transition-colors ${
-              offerType === "coupon" ? "border-[#22C55E] bg-[#F0FDF4]" : "border-[#F3F4F6] bg-white"
-            }`}
-          >
-            <span
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                offerType === "coupon" ? "bg-[#22C55E] text-white" : "bg-[#F3F4F6] text-[#6B7280]"
-              }`}
-            >
-              <Ticket className="h-4 w-4" strokeWidth={2.5} />
-            </span>
-            <span>
-              <span className="block text-sm font-semibold text-black">Coupon Code</span>
-              <span className="block text-xs text-[#9CA3AF]">Offer discount using coupon code</span>
-            </span>
-          </button>
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border-2 border-[#22C55E] bg-[#F0FDF4] p-3.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#22C55E] text-white">
+            <Ticket className="h-4 w-4" strokeWidth={2.5} />
+          </span>
+          <div>
+            <span className="block text-sm font-semibold text-black">Coupon Code</span>
+            <span className="block text-xs text-[#9CA3AF]">Offer discount using coupon code</span>
+          </div>
         </div>
 
-        {offerType === "percentage" ? (
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-[#374151]">Discount Value</label>
-              <div className="relative mt-1.5">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={2}
-                  value={discountValue}
-                  onChange={(event) => {
-                    const val = event.target.value.replace(/[^0-9]/g, "").slice(0, 2);
-                    setDiscountValue(val);
-                  }}
-                  placeholder="e.g. 20"
-                  className={`w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-[#F7931E] ${
-                    errors.discountValue ? "border-[#EF4444]" : "border-[#E5E7EB]"
-                  }`}
-                />
-                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[#9CA3AF]">
-                  %
-                </span>
-              </div>
-              {errors.discountValue && <p className="mt-1 text-xs text-[#EF4444]">Discount value is required.</p>}
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-[#374151]">Minimum Order Value (Optional)</label>
-              <input
-                type="number"
-                value={minOrderValue}
-                onChange={(event) => setMinOrderValue(event.target.value)}
-                placeholder="e.g. 500"
-                className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none focus:border-[#F7931E]"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="text-xs font-semibold text-[#374151]">Maximum Discount Value</label>
+        <div className="mt-4">
+          <label className="text-xs font-semibold text-[#374151]">Coupon Code</label>
+          <input
+            type="text"
+            value={coupon}
+            onChange={(event) => setCoupon(event.target.value.toUpperCase())}
+            placeholder="e.g. FESTIVE20"
+            className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold uppercase outline-none focus:border-[#F7931E] ${
+              errors.coupon ? "border-[#EF4444]" : "border-[#E5E7EB]"
+            }`}
+          />
+          {errors.coupon && <p className="mt-1 text-xs text-[#EF4444]">Coupon code is required.</p>}
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-semibold text-[#374151]">Discount Value</label>
+            <div className="relative mt-1.5">
               <input
                 type="text"
-                value={maxDiscountValue}
-                onChange={(event) => setMaxDiscountValue(event.target.value)}
-                placeholder="e.g. ₹ 200"
-                className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-[#F7931E] ${
-                  errors.maxDiscountValue ? "border-[#EF4444]" : "border-[#E5E7EB]"
+                inputMode="numeric"
+                maxLength={2}
+                value={discountValue}
+                onChange={(event) => {
+                  const val = event.target.value.replace(/[^0-9]/g, "").slice(0, 2);
+                  setDiscountValue(val);
+                }}
+                placeholder="e.g. 20"
+                className={`w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-[#F7931E] ${
+                  errors.discountValue ? "border-[#EF4444]" : "border-[#E5E7EB]"
                 }`}
               />
-              {errors.maxDiscountValue && (
-                <p className="mt-1 text-xs text-[#EF4444]">Maximum discount value is required.</p>
-              )}
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[#9CA3AF]">
+                %
+              </span>
             </div>
+            {errors.discountValue && <p className="mt-1 text-xs text-[#EF4444]">Discount value is required.</p>}
           </div>
-        ) : (
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-[#374151]">Coupon</label>
-              <select
-                value={coupon}
-                onChange={(event) => setCoupon(event.target.value)}
-                className={`mt-1.5 w-full cursor-pointer rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-[#F7931E] ${
-                  errors.coupon ? "border-[#EF4444]" : "border-[#E5E7EB]"
-                }`}
-              >
-                <option value="">Select a coupon</option>
-                <option value="FEV243">FEV243</option>
-                <option value="SAVE10">SAVE10</option>
-                <option value="WELCOME5">WELCOME5</option>
-              </select>
-              {errors.coupon && <p className="mt-1 text-xs text-[#EF4444]">Please select a coupon.</p>}
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-[#374151]">Minimum Order Value (Optional)</label>
-              <input
-                type="number"
-                value={minOrderValue}
-                onChange={(event) => setMinOrderValue(event.target.value)}
-                placeholder="e.g. 500"
-                className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none focus:border-[#F7931E]"
-              />
-            </div>
+
+          <div>
+            <label className="text-xs font-semibold text-[#374151]">Minimum Order Value (Optional)</label>
+            <input
+              type="number"
+              value={minOrderValue}
+              onChange={(event) => setMinOrderValue(event.target.value)}
+              placeholder="e.g. 500"
+              className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none focus:border-[#F7931E]"
+            />
           </div>
-        )}
+
+          <div className="col-span-2">
+            <label className="text-xs font-semibold text-[#374151]">Maximum Discount Value</label>
+            <input
+              type="text"
+              value={maxDiscountValue}
+              onChange={(event) => setMaxDiscountValue(event.target.value)}
+              placeholder="e.g. ₹ 200"
+              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-[#F7931E] ${
+                errors.maxDiscountValue ? "border-[#EF4444]" : "border-[#E5E7EB]"
+              }`}
+            />
+            {errors.maxDiscountValue && (
+              <p className="mt-1 text-xs text-[#EF4444]">Maximum discount value is required.</p>
+            )}
+          </div>
+        </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div>

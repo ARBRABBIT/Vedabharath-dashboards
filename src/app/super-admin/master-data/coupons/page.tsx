@@ -181,6 +181,7 @@ export default function CouponsPage() {
         open={launchOpen}
         onClose={() => setLaunchOpen(false)}
         defaultOfferType="coupon"
+        onLaunch={(newOffer) => setOffers((prev) => [newOffer, ...prev])}
       />
 
       <EditOfferModal

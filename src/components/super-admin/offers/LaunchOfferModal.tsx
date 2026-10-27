@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { ModalShell } from "@/components/orders/modals/ModalShell";
 import { PRODUCTS } from "@/components/super-admin/products/productsData";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 type OfferType = "percentage" | "coupon";
 type ApplyTarget = "all" | "limited";
@@ -442,28 +443,36 @@ export function LaunchOfferModal({ open, onClose, defaultOfferType = "coupon", o
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-[#9CA3AF]">Start Date</label>
-            <div className="relative mt-1.5">
-              <input
-                type="date"
+            <div className="mt-1.5">
+              <DatePicker
                 value={startDate}
-                onChange={(event) => setStartDate(event.target.value)}
-                className={`w-full cursor-pointer rounded-xl border px-4 py-2.5 text-sm text-black outline-none focus:border-[#F7931E] ${
-                  errors.startDate ? "border-[#EF4444]" : "border-[#E5E7EB]"
-                }`}
+                onChange={(val) => {
+                  setStartDate(val);
+                  if (errors.startDate) {
+                    setErrors((prev) => ({ ...prev, startDate: false }));
+                  }
+                }}
+                error={Boolean(errors.startDate)}
+                placeholder="dd/mm/yyyy"
               />
             </div>
             {errors.startDate && <p className="mt-1 text-xs text-[#EF4444]">Start date is required.</p>}
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-[#9CA3AF]">End Date</label>
-            <div className="relative mt-1.5">
-              <input
-                type="date"
+            <div className="mt-1.5">
+              <DatePicker
                 value={endDate}
-                onChange={(event) => setEndDate(event.target.value)}
-                className={`w-full cursor-pointer rounded-xl border px-4 py-2.5 text-sm text-black outline-none focus:border-[#F7931E] ${
-                  errors.endDate ? "border-[#EF4444]" : "border-[#E5E7EB]"
-                }`}
+                onChange={(val) => {
+                  setEndDate(val);
+                  if (errors.endDate) {
+                    setErrors((prev) => ({ ...prev, endDate: false }));
+                  }
+                }}
+                minDate={startDate}
+                align="right"
+                error={Boolean(errors.endDate)}
+                placeholder="dd/mm/yyyy"
               />
             </div>
             {errors.endDate && <p className="mt-1 text-xs text-[#EF4444]">End date is required.</p>}

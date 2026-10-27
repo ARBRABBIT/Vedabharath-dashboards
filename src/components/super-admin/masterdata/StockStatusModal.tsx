@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { ModalShell } from "@/components/orders/modals/ModalShell";
 import type { MasterProduct } from "@/components/super-admin/masterdata/masterDataData";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 type StockStatusModalProps = {
   product: MasterProduct | null;
@@ -16,6 +17,8 @@ export function StockStatusModal({ product, open, onClose }: StockStatusModalPro
   const [variant1Status, setVariant1Status] = useState("In Stock");
   const [variant2Status, setVariant2Status] = useState("Out of Stock");
   const [discountType, setDiscountType] = useState<"Coupon" | "Percentage">("Coupon");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   if (!product) return null;
 
@@ -127,17 +130,25 @@ export function StockStatusModal({ product, open, onClose }: StockStatusModalPro
 
           <div>
             <label className="text-xs font-semibold text-[#374151]">Start Date</label>
-            <input
-              type="date"
-              className="mt-1.5 w-full cursor-pointer rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm text-black outline-none focus:border-[#F7931E]"
-            />
+            <div className="mt-1.5">
+              <DatePicker
+                value={startDate}
+                onChange={setStartDate}
+                placeholder="dd/mm/yyyy"
+              />
+            </div>
           </div>
           <div>
             <label className="text-xs font-semibold text-[#374151]">End Date</label>
-            <input
-              type="date"
-              className="mt-1.5 w-full cursor-pointer rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm text-black outline-none focus:border-[#F7931E]"
-            />
+            <div className="mt-1.5">
+              <DatePicker
+                value={endDate}
+                onChange={setEndDate}
+                minDate={startDate}
+                align="right"
+                placeholder="dd/mm/yyyy"
+              />
+            </div>
           </div>
         </div>
 

@@ -16,6 +16,7 @@ import { NutrientsPickerModal } from "@/components/super-admin/masterdata/Nutrie
 import { TestimonialsPickerModal } from "@/components/super-admin/masterdata/TestimonialsPickerModal";
 import { PRODUCTS } from "@/components/super-admin/products/productsData";
 import { PageHeader } from "@/components/super-admin/ui/PageHeader";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 type WizardTab = "Basic Details" | "Cooking & benefits" | "Reviews & Offers";
 type Variant = { id: string; qty: string; mrp: string; sellingPrice: string };
@@ -823,21 +824,25 @@ export default function AddNewProductPage() {
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Start Date *</label>
-                    <input
-                      type="date"
-                      value={offerStartDate}
-                      onChange={(event) => setOfferStartDate(event.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm outline-none focus:border-[#F7931E]"
-                    />
+                    <div className="mt-1.5">
+                      <DatePicker
+                        value={offerStartDate}
+                        onChange={setOfferStartDate}
+                        placeholder="dd/mm/yyyy"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">End Date *</label>
-                    <input
-                      type="date"
-                      value={offerEndDate}
-                      onChange={(event) => setOfferEndDate(event.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm outline-none focus:border-[#F7931E]"
-                    />
+                    <div className="mt-1.5">
+                      <DatePicker
+                        value={offerEndDate}
+                        onChange={setOfferEndDate}
+                        minDate={offerStartDate}
+                        align="right"
+                        placeholder="dd/mm/yyyy"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Min. Order Value (₹) (Optional)</label>

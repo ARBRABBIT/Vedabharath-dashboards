@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, MapPin, Search, UserPlus } from "lucide-react";
+import { Building2, Search, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
@@ -29,7 +29,6 @@ function initials(name: string) {
 export default function UserManagementPage() {
   const [hubs, setHubs] = useState(INITIAL_HUBS);
   const [admins, setAdmins] = useState(INITIAL_ADMINS);
-  const [showAllHubs, setShowAllHubs] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
 
   const [createHubOpen, setCreateHubOpen] = useState(false);
@@ -46,8 +45,6 @@ export default function UserManagementPage() {
       window.history.replaceState(null, "", "/super-admin/users");
     }
   }, []);
-
-  const visibleHubs = showAllHubs ? hubs : hubs.slice(0, 2);
 
   const filteredCustomers = useMemo(() => {
     return CUSTOMERS.filter((customer) => customer.name.toLowerCase().includes(customerSearch.toLowerCase()));
@@ -152,17 +149,35 @@ export default function UserManagementPage() {
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
+          <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Active Hubs</p>
-            <p className="mt-1.5 text-3xl font-bold text-black">{hubs.filter((h) => h.status === "Active").length + 18}</p>
+            <div>
+              <p className="mt-1.5 text-3xl font-bold text-black">{hubs.filter((h) => h.status === "Active").length + 18}</p>
+            </div>
           </div>
-          <div className="rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
+          <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Admin Workforce</p>
-            <p className="mt-1.5 text-3xl font-bold text-black">{totalActiveAdmins + 134}</p>
+            <div>
+              <p className="mt-1.5 text-3xl font-bold text-black">{totalActiveAdmins + 134}</p>
+            </div>
           </div>
-          <div className="rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">High Performing Hub</p>
-            <p className="mt-1.5 truncate text-2xl font-bold text-black">{topHub?.name.replace(" Distribution Hub", "")}</p>
+          <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">High Performing Hub</p>
+              <button
+                type="button"
+                onClick={() => topHub && setViewingHub(topHub)}
+                className="cursor-pointer text-xs font-semibold text-[#F7931E] hover:underline"
+              >
+                View All →
+              </button>
+            </div>
+            <div>
+              <p className="mt-1.5 truncate text-2xl font-bold text-black">
+                {topHub?.name.replace(" Distribution Hub", "")}
+              </p>
+              <p className="mt-0.5 text-xs text-[#9CA3AF]">Last 30 days</p>
+            </div>
           </div>
           <Link
             href="/super-admin/users/orders"
@@ -172,89 +187,11 @@ export default function UserManagementPage() {
               <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Orders</p>
               <span className="text-xs font-semibold text-[#F7931E]">View →</span>
             </div>
-            <p className="mt-1.5 text-3xl font-bold text-black">202298</p>
+            <div>
+              <p className="mt-1.5 text-3xl font-bold text-black">202298</p>
+              <p className="mt-0.5 text-xs text-[#9CA3AF]">Last 30 days</p>
+            </div>
           </Link>
-        </div>
-
-        <div className="mt-8 flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Warehouses</p>
-          {hubs.length > 4 && (
-            <button
-              type="button"
-              onClick={() => setShowAllHubs((prev) => !prev)}
-              className="cursor-pointer text-xs font-semibold text-[#F7931E] hover:text-[#e07f0e]"
-            >
-              {showAllHubs ? "Show Less" : "View All"}
-            </button>
-          )}
-        </div>
-
-        <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {visibleHubs.map((hub) => {
-            const hubAdmins = admins.filter((admin) => admin.hubId === hub.id && admin.status === "Active");
-            return (
-              <div
-                key={hub.id}
-                className="flex flex-col gap-4 rounded-2xl border border-white bg-white p-6 shadow-[0px_4px_24px_rgba(0,0,0,0.04)]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-bold text-[#1D1D1F]">{hub.name}</h3>
-                      <span
-                        className={`inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
-                          hub.status === "Active"
-                            ? "border-[#D1FAE5] bg-[#ECFDF5] text-[#10B981]"
-                            : "border-[#E5E7EB] bg-[#F3F4F6] text-[#6B7280]"
-                        }`}
-                      >
-                        {hub.status}
-                      </span>
-                    </div>
-                    <p className="flex items-center gap-1.5 text-sm text-[#3E4A3C]">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-                      {hub.address}
-                    </p>
-                  </div>
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#EFF6E9]">
-                    <Building2 className="h-5 w-5 text-[#006E1F]" strokeWidth={2} />
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-1 rounded-lg bg-[#F9FAFB] p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-[#86868B]">Total Stock Capacity</p>
-                    <p className="text-sm font-bold text-[#1D1D1F]">{hub.stockCapacityPercent}%</p>
-                  </div>
-                  <div className="flex flex-col gap-1 rounded-lg bg-[#F9FAFB] p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-[#86868B]">Daily Order Vol</p>
-                    <p className="text-sm font-bold text-[#1D1D1F]">{hub.dailyOrderVolume}</p>
-                  </div>
-                  <div className="flex flex-col gap-1 rounded-lg bg-[#F9FAFB] p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-[#86868B]">Highly Ordered</p>
-                    <p className="truncate text-sm font-bold text-[#006E1F]">{hub.highlyOrdered}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-[#F0F0F0] pt-4">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-7 w-12 shrink-0 items-center">
-                      <span className="absolute left-0 h-7 w-7 rounded-full border-2 border-white bg-[#D5DCCF]" />
-                      <span className="absolute left-2 h-7 w-7 rounded-full border-2 border-white bg-[#83FC87]" />
-                    </span>
-                    <span className="text-xs font-medium text-[#3E4A3C]">{hubAdmins.length} Active Admins</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setViewingHub(hub)}
-                    className="cursor-pointer text-sm font-bold text-[#006E1F] hover:opacity-80"
-                  >
-                    View Hub Details
-                  </button>
-                </div>
-              </div>
-            );
-          })}
         </div>
 
         <div className="mt-8 flex items-center justify-between">

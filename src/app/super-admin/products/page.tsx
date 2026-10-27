@@ -32,24 +32,23 @@ export default function TopSellingProductsPage() {
         <PageHeader
           title="Top Selling Products"
           subtitle="Track product sales, stock availability and active orders."
+          right={
+            <div className="rounded-full border border-[#E5E7EB] bg-white">
+              <FilterDropdown
+                value={dateRange}
+                onChange={setDateRange}
+                icon={<Calendar className="h-4 w-4 shrink-0 text-[#6B7280]" strokeWidth={2} />}
+                options={[
+                  { value: "7", label: "Last 7 Days" },
+                  { value: "30", label: "Last 30 Days" },
+                  { value: "90", label: "Last 90 Days" },
+                ]}
+              />
+            </div>
+          }
         />
 
-        <div className="mt-6 flex items-center justify-end">
-          <div className="rounded-full border border-[#E5E7EB] bg-white">
-            <FilterDropdown
-              value={dateRange}
-              onChange={setDateRange}
-              icon={<Calendar className="h-4 w-4 shrink-0 text-[#6B7280]" strokeWidth={2} />}
-              options={[
-                { value: "7", label: "Last 7 Days" },
-                { value: "30", label: "Last 30 Days" },
-                { value: "90", label: "Last 90 Days" },
-              ]}
-            />
-          </div>
-        </div>
-
-        <div className="mt-5 overflow-hidden rounded-[32px] border-2 border-black/[0.04] bg-white">
+        <div className="mt-6 overflow-hidden rounded-[32px] border-2 border-black/[0.04] bg-white">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px]">
               <thead>

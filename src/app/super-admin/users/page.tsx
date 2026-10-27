@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, FileText, MapPin, Search, UserPlus } from "lucide-react";
+import { Building2, MapPin, Search, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
@@ -132,13 +132,6 @@ export default function UserManagementPage() {
             <p className="mt-1 text-sm text-[#6B7280]">Manage regional distribution centers and assigned personnel.</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              href="/super-admin/users/drafts"
-              className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
-            >
-              <FileText className="h-4 w-4 text-[#6B7280]" strokeWidth={2} />
-              Drafts
-            </Link>
             <button
               type="button"
               onClick={() => setCreateHubOpen(true)}

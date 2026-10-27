@@ -4,7 +4,7 @@ import { ChevronDown, FileText, Filter, MapPin, Phone, Search } from "lucide-rea
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
-import { EMPTY_FILTERS, FiltersModal, type OrderFilters } from "@/components/super-admin/orders/FiltersModal";
+import { DEFAULT_WAREHOUSES, EMPTY_FILTERS, FiltersModal, type OrderFilters } from "@/components/super-admin/orders/FiltersModal";
 import { OrderDetailModal } from "@/components/super-admin/orders/OrderDetailModal";
 import { INITIAL_ORDERS, statusPillClasses, type Order } from "@/components/super-admin/orders/ordersData";
 import { PageHeader } from "@/components/super-admin/ui/PageHeader";
@@ -44,6 +44,9 @@ export default function UserManagementOrdersPage() {
       const matchesMethod = filters.methods.length === 0 || filters.methods.includes(order.paymentMethod);
       const matchesProduct =
         filters.products.length === 0 || order.items.some((item) => filters.products.includes(item.name));
+      const matchesWarehouse =
+        filters.warehouses.length === 0 ||
+        (order.warehouse && filters.warehouses.includes(order.warehouse));
       const matchesDate = (() => {
         if (!filters.dateFrom) return true;
         const placedOn = new Date();
@@ -52,7 +55,14 @@ export default function UserManagementOrdersPage() {
         const to = filters.dateTo ?? filters.dateFrom;
         return iso >= filters.dateFrom && iso <= to;
       })();
-      return matchesSearch && matchesStatus && matchesMethod && matchesProduct && matchesDate;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesMethod &&
+        matchesProduct &&
+        matchesWarehouse &&
+        matchesDate
+      );
     });
   }, [search, filters]);
 
@@ -60,6 +70,7 @@ export default function UserManagementOrdersPage() {
     filters.statuses.length +
     filters.methods.length +
     filters.products.length +
+    filters.warehouses.length +
     (filters.dateQuick || filters.dateFrom ? 1 : 0);
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -158,6 +169,12 @@ export default function UserManagementOrdersPage() {
                         <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#F7931E]" strokeWidth={2} />
                         {order.address}
                       </div>
+                      {order.warehouse && (
+                        <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-[#EFF6E9] px-2 py-1 text-[11px] font-semibold text-[#006E1F]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                          {order.warehouse}
+                        </div>
+                      )}
                     </div>
                     <div className="sm:border-x sm:border-[#F3F4F6] sm:pl-2 sm:pr-6">
                       <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Ordered Items</p>
@@ -223,6 +240,7 @@ export default function UserManagementOrdersPage() {
         products={productOptions}
         statuses={STATUS_OPTIONS}
         methods={METHOD_OPTIONS}
+        warehouses={DEFAULT_WAREHOUSES}
         value={filters}
         onApply={setFilters}
       />

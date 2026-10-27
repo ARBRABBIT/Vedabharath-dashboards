@@ -8,6 +8,7 @@ export type OrderFilters = {
   products: string[];
   statuses: string[];
   methods: string[];
+  warehouses: string[];
   dateQuick: string | null;
   dateFrom: string | null;
   dateTo: string | null;
@@ -17,13 +18,23 @@ export const EMPTY_FILTERS: OrderFilters = {
   products: [],
   statuses: [],
   methods: [],
+  warehouses: [],
   dateQuick: null,
   dateFrom: null,
   dateTo: null,
 };
 
-type Tab = "Product" | "Status" | "Method" | "Date";
-const TABS: Tab[] = ["Product", "Status", "Method", "Date"];
+type Tab = "Product" | "Status" | "Method" | "Warehouse" | "Date";
+const TABS: Tab[] = ["Product", "Status", "Method", "Warehouse", "Date"];
+
+export const DEFAULT_WAREHOUSES = [
+  "Whitefield Distribution Hub",
+  "Gachibowli Distribution Hub",
+  "Kukatpally Distribution Hub",
+  "Secunderabad Distribution Hub",
+  "HSR Layout Distribution Hub",
+  "Indiranagar Distribution Hub",
+];
 
 type FiltersModalProps = {
   open: boolean;
@@ -31,6 +42,7 @@ type FiltersModalProps = {
   products: string[];
   statuses: string[];
   methods: string[];
+  warehouses?: string[];
   value: OrderFilters;
   onApply: (filters: OrderFilters) => void;
 };
@@ -103,7 +115,16 @@ function CheckRow({
   );
 }
 
-export function FiltersModal({ open, onClose, products, statuses, methods, value, onApply }: FiltersModalProps) {
+export function FiltersModal({
+  open,
+  onClose,
+  products,
+  statuses,
+  methods,
+  warehouses = DEFAULT_WAREHOUSES,
+  value,
+  onApply,
+}: FiltersModalProps) {
   const [tab, setTab] = useState<Tab>("Product");
   const [draft, setDraft] = useState<OrderFilters>(value);
   const [viewMonth, setViewMonth] = useState(() => (value.dateFrom ? new Date(value.dateFrom) : new Date()));
@@ -195,6 +216,19 @@ export function FiltersModal({ open, onClose, products, statuses, methods, value
                     label={method}
                     checked={draft.methods.includes(method)}
                     onToggle={() => setDraft((prev) => ({ ...prev, methods: toggle(prev.methods, method) }))}
+                  />
+                ))}
+              </div>
+            )}
+
+            {tab === "Warehouse" && (
+              <div className="flex flex-col gap-3">
+                {warehouses.map((warehouse) => (
+                  <CheckRow
+                    key={warehouse}
+                    label={warehouse}
+                    checked={draft.warehouses.includes(warehouse)}
+                    onToggle={() => setDraft((prev) => ({ ...prev, warehouses: toggle(prev.warehouses, warehouse) }))}
                   />
                 ))}
               </div>

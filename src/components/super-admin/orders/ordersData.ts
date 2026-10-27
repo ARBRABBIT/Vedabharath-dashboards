@@ -16,6 +16,7 @@ export type Order = {
   phone: string;
   email: string;
   address: string;
+  warehouse?: string;
   amount: number;
   shipping: number;
   paymentMethod: string;
@@ -37,6 +38,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 98765 43210",
     email: "priya.patel@email.com",
     address: "42, Greenfield Residency, Block C, Whitefield, Bengaluru, Karnataka, 560066",
+    warehouse: "Whitefield Distribution Hub",
     amount: 1200,
     shipping: 50,
     paymentMethod: "UPI Payment",
@@ -54,6 +56,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 87654 32109",
     email: "karthik.suraj@email.com",
     address: "42, Greenfield Residency, Block C, Whitefield, Bengaluru, Karnataka, 560066",
+    warehouse: "Whitefield Distribution Hub",
     amount: 2450,
     shipping: 50,
     paymentMethod: "Net Banking",
@@ -68,6 +71,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 98450 12345",
     email: "sneha.desai@email.com",
     address: "402, Lotus Apartment, 12th Main Road, HAL 2nd Stage, Indiranagar, Bangalore - 560038",
+    warehouse: "Indiranagar Distribution Hub",
     amount: 450,
     shipping: 40,
     paymentMethod: "COD",
@@ -82,6 +86,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 76543 21098",
     email: "rahul.sharma@email.com",
     address: "HSR Layout, Sector 2, Bengaluru, Karnataka - 560102",
+    warehouse: "HSR Layout Distribution Hub",
     amount: 1800,
     shipping: 50,
     paymentMethod: "UPI Payment",
@@ -96,6 +101,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 94321 09876",
     email: "anita.reddy@email.com",
     address: "Koramangala 5th Block, Bengaluru, Karnataka - 560095",
+    warehouse: "Kukatpally Distribution Hub",
     amount: 3200,
     shipping: 50,
     paymentMethod: "Card Payment",
@@ -110,6 +116,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 76543 21098",
     email: "rahul.verma@email.com",
     address: "42, Greenfield Residency, Block C, Whitefield, Bengaluru, Karnataka, 560066",
+    warehouse: "Whitefield Distribution Hub",
     amount: 1820,
     shipping: 50,
     paymentMethod: "Prepaid (UPI)",
@@ -124,6 +131,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 98765 43210",
     email: "karthik.suraj@email.com",
     address: "Flat 402, Green Meadows, HSR Layout, Sector 2, Bangalore, Karnataka - 560102",
+    warehouse: "HSR Layout Distribution Hub",
     amount: 1200,
     shipping: 50,
     paymentMethod: "Prepaid (UPI)",
@@ -141,6 +149,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 98450 12345",
     email: "meera.nair@email.com",
     address: "Jubilee Hills, Road No. 36, Hyderabad, Telangana - 500033",
+    warehouse: "Gachibowli Distribution Hub",
     amount: 950,
     shipping: 40,
     paymentMethod: "COD",
@@ -155,6 +164,7 @@ export const INITIAL_ORDERS: Order[] = [
     phone: "+91 90123 45671",
     email: "arjun.rao@email.com",
     address: "Flat 402, Lotus Apartments, 7th Cross, Indiranagar, Bengaluru, KA 560038",
+    warehouse: "Indiranagar Distribution Hub",
     amount: 1650,
     shipping: 50,
     paymentMethod: "Prepaid (UPI)",

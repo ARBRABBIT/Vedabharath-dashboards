@@ -11,12 +11,10 @@ import { PageHeader } from "@/components/super-admin/ui/PageHeader";
 import { Pagination } from "@/components/super-admin/ui/Pagination";
 
 const PAGE_SIZE = 5;
-type Tab = "Percentage" | "Coupon" | "Drafts";
 type StatusFilter = "All Statuses" | Offer["status"];
 
 export default function CouponsPage() {
   const [offers, setOffers] = useState<Offer[]>(OFFERS);
-  const [tab, setTab] = useState<Tab>("Coupon");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All Statuses");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -29,15 +27,15 @@ export default function CouponsPage() {
 
   const filtered = useMemo(() => {
     return offers.filter((offer) => {
-      const matchesTab = tab === "Drafts" ? false : offer.type === tab;
+      const isCoupon = offer.type === "Coupon";
       const matchesStatus = statusFilter === "All Statuses" ? true : offer.status === statusFilter;
       const matchesSearch =
         offer.name.toLowerCase().includes(search.toLowerCase()) ||
         offer.subtitle.toLowerCase().includes(search.toLowerCase()) ||
         offer.discount.toLowerCase().includes(search.toLowerCase());
-      return matchesTab && matchesStatus && matchesSearch;
+      return isCoupon && matchesStatus && matchesSearch;
     });
-  }, [offers, tab, statusFilter, search]);
+  }, [offers, statusFilter, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -49,7 +47,7 @@ export default function CouponsPage() {
       <main className="flex-1 px-6 pb-10 pt-6 sm:px-10 lg:px-16">
         <PageHeader
           title="Coupons"
-          subtitle="Track the performance of all your marketing campaigns and offers"
+          subtitle="Track the performance of all your coupon campaigns and offers"
           backHref="/super-admin/master-data"
           right={
             <div className="rounded-full border border-[#E5E7EB] bg-white">
@@ -71,23 +69,9 @@ export default function CouponsPage() {
         />
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1 rounded-full bg-white p-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
-            {(["Percentage", "Coupon", "Drafts"] as Tab[]).map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => {
-                  setTab(option);
-                  setPage(1);
-                }}
-                className={`cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
-                  tab === option ? "bg-[#F7931E] text-white" : "text-[#374151] hover:text-black"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
+          <p className="text-sm font-semibold text-[#6B7280]">
+            All Coupons ({filtered.length})
+          </p>
 
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -99,8 +83,8 @@ export default function CouponsPage() {
                   setSearch(event.target.value);
                   setPage(1);
                 }}
-                placeholder="Search..."
-                className="w-[200px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-11 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                placeholder="Search Coupons..."
+                className="w-[200px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-11 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E] sm:w-[240px]"
               />
             </div>
             <button
@@ -109,7 +93,7 @@ export default function CouponsPage() {
               className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               <Plus className="h-4 w-4" strokeWidth={2.5} />
-              New Offer
+              Add New Coupon
             </button>
           </div>
         </div>
@@ -186,7 +170,7 @@ export default function CouponsPage() {
               totalPages={totalPages}
               totalItems={filtered.length}
               pageSize={PAGE_SIZE}
-              itemLabel="campaigns"
+              itemLabel="coupons"
               onPageChange={setPage}
             />
           </div>
@@ -196,6 +180,7 @@ export default function CouponsPage() {
       <LaunchOfferModal
         open={launchOpen}
         onClose={() => setLaunchOpen(false)}
+        defaultOfferType="coupon"
       />
 
       <EditOfferModal

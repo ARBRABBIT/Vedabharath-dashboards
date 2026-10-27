@@ -37,11 +37,12 @@ const SAMPLE_PRODUCTS = PRODUCTS.slice(0, 6).map((product) => ({
 type LaunchOfferModalProps = {
   open: boolean;
   onClose: () => void;
+  defaultOfferType?: OfferType;
 };
 
-export function LaunchOfferModal({ open, onClose }: LaunchOfferModalProps) {
+export function LaunchOfferModal({ open, onClose, defaultOfferType = "percentage" }: LaunchOfferModalProps) {
   const [step, setStep] = useState<Step>("form");
-  const [offerType, setOfferType] = useState<OfferType>("percentage");
+  const [offerType, setOfferType] = useState<OfferType>(defaultOfferType);
   const [applyTarget, setApplyTarget] = useState<ApplyTarget>("all");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
@@ -58,7 +59,7 @@ export function LaunchOfferModal({ open, onClose }: LaunchOfferModalProps) {
 
   function reset() {
     setStep("form");
-    setOfferType("percentage");
+    setOfferType(defaultOfferType);
     setApplyTarget("all");
     setSelectedProducts([]);
     setSelectedCustomers([]);

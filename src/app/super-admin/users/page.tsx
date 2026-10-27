@@ -164,13 +164,12 @@ export default function UserManagementPage() {
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">High Performing Hub</p>
-              <button
-                type="button"
-                onClick={() => topHub && setViewingHub(topHub)}
+              <Link
+                href="/super-admin/users/hubs"
                 className="cursor-pointer text-xs font-semibold text-[#F7931E] hover:underline"
               >
                 View All →
-              </button>
+              </Link>
             </div>
             <div>
               <p className="mt-1.5 truncate text-2xl font-bold text-black">

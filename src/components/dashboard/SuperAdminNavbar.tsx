@@ -25,8 +25,6 @@ const SUPER_ADMIN_NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/super-admin" },
   { label: "Master Data", href: "/super-admin/master-data" },
   { label: "User Management", href: "/super-admin/users" },
-  { label: "Revenue Management", href: "/super-admin/revenue" },
-  { label: "Site Content", href: "/super-admin/site-content" },
 ];
 
 function formatNotificationCount(count: number) {

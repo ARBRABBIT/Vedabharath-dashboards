@@ -579,7 +579,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
           </div>
         </div>
       ) : (
-        <div className="flex flex-col max-h-[86vh]">
+        <div className="flex flex-col max-h-[86vh] overflow-hidden rounded-[24px]">
           {/* Header */}
           <div className="border-b border-[#F0F0F2] px-7 py-5">
             <div className="flex items-center gap-2.5">
@@ -1006,7 +1006,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
           </div>
 
           {/* Footer Actions */}
-          <div className="border-t border-[#F0F0F2] px-7 py-4 flex items-center justify-between bg-white">
+          <div className="border-t border-[#F0F0F2] px-7 py-4 flex items-center justify-between bg-white rounded-b-[24px]">
             <button
               type="button"
               onClick={onClose}

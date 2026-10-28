@@ -48,7 +48,7 @@ export function ModalShell({ open, onClose, maxWidth = "max-w-[500px]", children
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             onClick={(event) => event.stopPropagation()}
-            className={`modal-card relative w-full ${maxWidth} rounded-[24px] bg-white shadow-[0_32px_80px_rgba(0,0,0,0.12)]`}
+            className={`modal-card relative w-full ${maxWidth} overflow-hidden rounded-[24px] bg-white shadow-[0_32px_80px_rgba(0,0,0,0.12)]`}
           >
             <button
               type="button"

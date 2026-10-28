@@ -18,6 +18,7 @@ export type HubFormData = {
   adminId: string;
   coordinates?: string;
   geoTags?: string;
+  mapLink?: string;
 };
 
 type CreateHubModalProps = {
@@ -33,6 +34,7 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
   const [address, setAddress] = useState("");
   const [coordinates, setCoordinates] = useState("");
   const [geoTags, setGeoTags] = useState("");
+  const [mapLink, setMapLink] = useState("");
   const [adminId, setAdminId] = useState("");
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [error, setError] = useState(false);
@@ -41,10 +43,10 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
   useEffect(() => {
     if (!open) return;
     setName(initial?.name ?? "");
-    const defaultPreset = WAREHOUSE_PRESETS[0];
-    setAddress(initial?.facilityAddress ?? defaultPreset.fullAddress);
-    setCoordinates(defaultPreset.coordinates);
-    setGeoTags(defaultPreset.geoTags);
+    setAddress(initial?.facilityAddress ?? "");
+    setCoordinates(initial ? "12.9850° N, 77.7400° E" : "");
+    setGeoTags(initial ? "#EastBangalore, #Logistics" : "");
+    setMapLink(initial ? `https://maps.google.com/?q=${encodeURIComponent(initial.facilityAddress)}` : "");
     setAdminId(admins.find((admin) => admin.hubId === initial?.id)?.id ?? "");
     setError(false);
     setStep("form");
@@ -73,6 +75,7 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
       adminId,
       coordinates: coordinates.trim(),
       geoTags: geoTags.trim(),
+      mapLink: mapLink.trim(),
     });
     setStep("success");
   }
@@ -184,9 +187,21 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
               </div>
             </div>
 
+            {/* Map Link */}
+            <div>
+              <label className="text-sm font-semibold text-black">Map Link</label>
+              <input
+                type="text"
+                value={mapLink}
+                onChange={(event) => setMapLink(event.target.value)}
+                placeholder="e.g., https://maps.google.com/?q=..."
+                className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+              />
+            </div>
+
             {error && (
               <p className="rounded-xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#EF4444]">
-                Please fill in Hub Name and Full Address.
+                Please fill in Warehouse Name and Full Address.
               </p>
             )}
           </div>
@@ -215,10 +230,11 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
         open={mapModalOpen}
         onClose={() => setMapModalOpen(false)}
         initialAddress={address}
-        onConfirmLocation={(confirmedAddr, confirmedCoords, confirmedTags) => {
+        onConfirmLocation={(confirmedAddr, confirmedCoords, confirmedTags, confirmedMapLink) => {
           setAddress(confirmedAddr);
           if (confirmedCoords) setCoordinates(confirmedCoords);
           if (confirmedTags) setGeoTags(confirmedTags);
+          if (confirmedMapLink) setMapLink(confirmedMapLink);
           setError(false);
         }}
       />

@@ -12,6 +12,7 @@ export type WarehouseLocation = {
   fullAddress: string;
   coordinates: string;
   geoTags: string;
+  mapLink: string;
   x: number; // percentage (0-100)
   y: number; // percentage (0-100)
 };
@@ -25,6 +26,7 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     fullAddress: "Plot 42, KIADB Industrial Area, Phase 2, Hoodi, Whitefield, Bangalore, Karnataka - 560066",
     coordinates: "12.9850° N, 77.7400° E",
     geoTags: "#EastBangalore, #IndustrialZone, #Tier1",
+    mapLink: "https://maps.google.com/?q=12.9850,77.7400",
     x: 76,
     y: 38,
   },
@@ -36,6 +38,7 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     fullAddress: "Survey No. 88, Electronic City Phase 1, Near Hosur Main Road, Bangalore, Karnataka - 560100",
     coordinates: "12.8452° N, 77.6602° E",
     geoTags: "#SouthBangalore, #TechCorridor, #ExpressHub",
+    mapLink: "https://maps.google.com/?q=12.8452,77.6602",
     x: 65,
     y: 78,
   },
@@ -47,6 +50,7 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     fullAddress: "Shed 15, Peenya 4th Phase, Industrial Estate, Bangalore, Karnataka - 560058",
     coordinates: "13.0285° N, 77.5195° E",
     geoTags: "#NorthBangalore, #IndustrialBelt, #HeavyLogistics",
+    mapLink: "https://maps.google.com/?q=13.0285,77.5195",
     x: 24,
     y: 28,
   },
@@ -58,6 +62,7 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     fullAddress: "Plot 12-B, Financial District, Nanakramguda, Gachibowli, Hyderabad, Telangana - 500032",
     coordinates: "17.4401° N, 78.3489° E",
     geoTags: "#Hyderabad, #FinancialDistrict, #MetroHub",
+    mapLink: "https://maps.google.com/?q=17.4401,78.3489",
     x: 44,
     y: 48,
   },
@@ -69,6 +74,7 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     fullAddress: "Survey 45/A, Shamshabad International Airport Cargo Zone, Hyderabad, Telangana - 500409",
     coordinates: "17.2403° N, 78.4294° E",
     geoTags: "#Hyderabad, #AirportCargo, #ExpressCargo",
+    mapLink: "https://maps.google.com/?q=17.2403,78.4294",
     x: 52,
     y: 84,
   },
@@ -80,6 +86,7 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     fullAddress: "Plot 104, 3rd Cross, Bommasandra Industrial Area, Anekal Taluk, Bangalore, Karnataka - 560099",
     coordinates: "12.8123° N, 77.6890° E",
     geoTags: "#Bangalore, #LogisticsPark, #Anekal",
+    mapLink: "https://maps.google.com/?q=12.8123,77.6890",
     x: 82,
     y: 88,
   },
@@ -105,6 +112,7 @@ function getNearestOrCustomLocation(x: number, y: number): WarehouseLocation {
   const lng = (77.2 + x * 0.015).toFixed(4);
   const coordinates = `${lat}° N, ${lng}° E`;
   const geoTags = `#${city}, #${zoneName.replace(/\s+/g, "")}, #Sector${sector}`;
+  const mapLink = `https://maps.google.com/?q=${lat},${lng}`;
 
   return {
     id: `loc-${Math.round(x)}-${Math.round(y)}`,
@@ -114,6 +122,7 @@ function getNearestOrCustomLocation(x: number, y: number): WarehouseLocation {
     fullAddress: `Plot No. ${sector * 8 + block}, Sector ${sector}, ${zoneName}, ${city}, ${city === "Bangalore" ? "Karnataka" : "Telangana"} - ${pin}`,
     coordinates,
     geoTags,
+    mapLink,
     x: Math.round(x),
     y: Math.round(y),
   };
@@ -337,7 +346,7 @@ export function WarehouseMapInlinePicker({
 }) {
   // Find preset or fallback
   const location = useMemo(() => {
-    if (!selectedAddress) return WAREHOUSE_PRESETS[0];
+    if (!selectedAddress || !selectedAddress.trim()) return null;
     const match = WAREHOUSE_PRESETS.find((p) =>
       selectedAddress.toLowerCase().includes(p.name.toLowerCase()) ||
       selectedAddress.toLowerCase().includes(p.area.toLowerCase())
@@ -348,8 +357,8 @@ export function WarehouseMapInlinePicker({
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white transition-all hover:border-[#D1D5DB] shadow-sm">
       {/* Map Graphic Container */}
-      <div className="relative h-[160px] w-full" onClick={onOpenEnlarge}>
-        <MapGraphic pinLocation={{ x: location.x, y: location.y, name: location.name }} showLabels={false} />
+      <div className="relative h-[160px] w-full cursor-pointer" onClick={onOpenEnlarge}>
+        <MapGraphic pinLocation={location ? { x: location.x, y: location.y, name: location.name } : undefined} showLabels={false} />
 
         {/* Top-Right Enlarge CTA Button */}
         <div className="absolute right-3 top-3">
@@ -369,13 +378,22 @@ export function WarehouseMapInlinePicker({
 
         {/* Bottom Address Overlay on Inline View */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-6 text-white pointer-events-none">
-          <p className="flex items-center gap-1.5 text-xs font-bold">
-            <MapPin className="h-3.5 w-3.5 text-[#F7931E]" strokeWidth={2.5} />
-            {location.name}
-          </p>
-          <p className="mt-0.5 truncate text-[11px] text-white/80">
-            {location.fullAddress}
-          </p>
+          {location ? (
+            <>
+              <p className="flex items-center gap-1.5 text-xs font-bold">
+                <MapPin className="h-3.5 w-3.5 text-[#F7931E]" strokeWidth={2.5} />
+                {location.name}
+              </p>
+              <p className="mt-0.5 truncate text-[11px] text-white/80">
+                {location.fullAddress}
+              </p>
+            </>
+          ) : (
+            <p className="flex items-center gap-1.5 text-xs font-medium text-white/90">
+              <MapPin className="h-3.5 w-3.5 text-[#F7931E]" strokeWidth={2.5} />
+              Click to pin or select warehouse location on map
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -392,7 +410,7 @@ export function WarehouseLocationMapModal({
   open: boolean;
   onClose: () => void;
   initialAddress?: string;
-  onConfirmLocation: (address: string, coordinates?: string, geoTags?: string) => void;
+  onConfirmLocation: (address: string, coordinates?: string, geoTags?: string, mapLink?: string) => void;
 }) {
   const [activeLocation, setActiveLocation] = useState<WarehouseLocation>(() => {
     if (initialAddress) {
@@ -441,7 +459,7 @@ export function WarehouseLocationMapModal({
   }
 
   function handleConfirm() {
-    onConfirmLocation(activeLocation.fullAddress, activeLocation.coordinates, activeLocation.geoTags);
+    onConfirmLocation(activeLocation.fullAddress, activeLocation.coordinates, activeLocation.geoTags, activeLocation.mapLink);
     onClose();
   }
 
@@ -624,6 +642,18 @@ export function WarehouseLocationMapModal({
                     className="mt-1 w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-3.5 py-2 text-xs text-black outline-none transition-colors focus:border-[#F7931E] focus:bg-white"
                   />
                 </div>
+              </div>
+
+              {/* Map Link Field */}
+              <div className="mt-2.5">
+                <label className="block text-xs font-semibold text-black">Map Link</label>
+                <input
+                  type="text"
+                  value={activeLocation.mapLink || ""}
+                  onChange={(e) => setActiveLocation({ ...activeLocation, mapLink: e.target.value })}
+                  placeholder="e.g., https://maps.google.com/?q=..."
+                  className="mt-1 w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-3.5 py-2 text-xs text-black outline-none transition-colors focus:border-[#F7931E] focus:bg-white"
+                />
               </div>
 
               {/* Right-aligned CTAs */}

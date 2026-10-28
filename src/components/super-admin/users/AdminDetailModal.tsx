@@ -59,11 +59,11 @@ export function AdminDetailModal({ admin, hub, hubs, allAdmins, open, onClose, o
     return (
       <ModalShell open={open} onClose={closeAll} maxWidth="max-w-[440px]">
         <div className="p-6">
-          <h2 className="text-xl font-bold text-black">Re-Assign Distribution Hub</h2>
+          <h2 className="text-xl font-bold text-black">Re-Assign Distribution Warehouse</h2>
 
           <div className="mt-5 flex flex-col gap-4">
             <div>
-              <label className="text-sm font-semibold text-black">Hub Name</label>
+              <label className="text-sm font-semibold text-black">Warehouse Name</label>
               <select
                 value={selectedHubId}
                 onChange={(event) => {

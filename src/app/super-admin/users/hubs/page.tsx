@@ -84,7 +84,7 @@ export default function HighPerformingHubsPage() {
 
       <main className="flex-1 px-6 pb-12 pt-6 sm:px-10 lg:px-16">
         <PageHeader
-          title="Distribution Hubs"
+          title="Distribution Warehouses"
           subtitle="Performance, capacity, and active workforce across all regional distribution centers."
           backHref="/super-admin/users"
           right={
@@ -120,7 +120,7 @@ export default function HighPerformingHubsPage() {
             </div>
             <div>
               <p className="mt-1.5 truncate text-2xl font-bold text-black">
-                {topHub?.name.replace(" Distribution Hub", "")}
+                {topHub?.name.replace(" Distribution Warehouse", "").replace(" Distribution Hub", "")}
               </p>
               <p className="mt-0.5 text-xs text-[#6B7280]">
                 {topHub?.stockCapacityPercent}% Capacity · {topHub?.dailyOrderVolume}/day
@@ -140,7 +140,7 @@ export default function HighPerformingHubsPage() {
             <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Admin Workforce</p>
             <div>
               <p className="mt-1.5 text-3xl font-bold text-black">{admins.length + 130}</p>
-              <p className="mt-0.5 text-xs text-[#6B7280]">Across regional hubs</p>
+              <p className="mt-0.5 text-xs text-[#6B7280]">Across regional warehouses</p>
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function HighPerformingHubsPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search hubs, location, or crop..."
+                placeholder="Search warehouses, location, or crop..."
                 className="w-[300px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-10 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
               />
             </div>
@@ -194,7 +194,7 @@ export default function HighPerformingHubsPage() {
                 <thead>
                   <tr className="border-b border-[#F3F4F6] text-left text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
                     <th className="px-6 py-4">Rank</th>
-                    <th className="px-4 py-4">Hub Name & Location</th>
+                    <th className="px-4 py-4">Warehouse Name & Location</th>
                     <th className="px-4 py-4">Stock Capacity</th>
                     <th className="px-4 py-4">Daily Volume</th>
                     <th className="px-4 py-4">Highly Ordered</th>
@@ -206,7 +206,7 @@ export default function HighPerformingHubsPage() {
                   {filteredHubs.length === 0 && (
                     <tr>
                       <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#9CA3AF]">
-                        No distribution hubs match your search.
+                        No distribution warehouses match your search.
                       </td>
                     </tr>
                   )}

@@ -173,7 +173,7 @@ export default function UserManagementPage() {
             </div>
             <div>
               <p className="mt-1.5 truncate text-2xl font-bold text-black">
-                {topHub?.name.replace(" Distribution Hub", "")}
+                {topHub?.name.replace(" Distribution Warehouse", "").replace(" Distribution Hub", "")}
               </p>
               <p className="mt-0.5 text-xs text-[#9CA3AF]">Last 30 days</p>
             </div>

@@ -39,7 +39,7 @@ export type Customer = {
 export const INITIAL_HUBS: Hub[] = [
   {
     id: "hub-1",
-    name: "Kukatpally Distribution Hub",
+    name: "Kukatpally Distribution Warehouse",
     status: "Active",
     address: "Phase 3, Kukatpally Industrial Estate",
     stockCapacityPercent: 84,
@@ -53,7 +53,7 @@ export const INITIAL_HUBS: Hub[] = [
   },
   {
     id: "hub-2",
-    name: "Gachibowli Distribution Hub",
+    name: "Gachibowli Distribution Warehouse",
     status: "Active",
     address: "Financial District, Nanakramguda",
     stockCapacityPercent: 96,
@@ -67,7 +67,7 @@ export const INITIAL_HUBS: Hub[] = [
   },
   {
     id: "hub-3",
-    name: "Secunderabad Distribution Hub",
+    name: "Secunderabad Distribution Warehouse",
     status: "Active",
     address: "Habsiguda, Secunderabad",
     stockCapacityPercent: 62,
@@ -81,7 +81,7 @@ export const INITIAL_HUBS: Hub[] = [
   },
   {
     id: "hub-4",
-    name: "Whitefield Distribution Hub",
+    name: "Whitefield Distribution Warehouse",
     status: "Active",
     address: "ITPL Road, Whitefield",
     stockCapacityPercent: 71,
@@ -95,7 +95,7 @@ export const INITIAL_HUBS: Hub[] = [
   },
   {
     id: "hub-5",
-    name: "HSR Layout Distribution Hub",
+    name: "HSR Layout Distribution Warehouse",
     status: "Active",
     address: "Sector 2, HSR Layout",
     stockCapacityPercent: 45,
@@ -109,7 +109,7 @@ export const INITIAL_HUBS: Hub[] = [
   },
   {
     id: "hub-6",
-    name: "Indiranagar Distribution Hub",
+    name: "Indiranagar Distribution Warehouse",
     status: "Inactive",
     address: "100 Feet Road, Indiranagar",
     stockCapacityPercent: 20,

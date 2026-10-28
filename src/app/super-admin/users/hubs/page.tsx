@@ -261,10 +261,10 @@ export default function HighPerformingHubsPage() {
                               <div
                                 className={`h-full rounded-full ${
                                   hub.stockCapacityPercent > 80
-                                    ? "bg-[#22C55E]"
+                                    ? "bg-[#EF4444]"
                                     : hub.stockCapacityPercent > 50
                                       ? "bg-[#F7931E]"
-                                      : "bg-[#EF4444]"
+                                      : "bg-[#22C55E]"
                                 }`}
                                 style={{ width: `${hub.stockCapacityPercent}%` }}
                               />
@@ -393,7 +393,7 @@ export default function HighPerformingHubsPage() {
                       onClick={() => setViewingHub(hub)}
                       className="cursor-pointer text-xs font-bold text-[#F7931E] transition-colors hover:underline"
                     >
-                      View Hub Details →
+                      View Warehouse Details →
                     </button>
                   </div>
                 </div>

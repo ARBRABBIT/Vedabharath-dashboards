@@ -96,7 +96,7 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
             </motion.div>
           </motion.div>
           <div>
-            <h2 className="text-xl font-bold text-black">{initial ? "Hub Updated" : "Distribution Hub Created"}</h2>
+            <h2 className="text-xl font-bold text-black">{initial ? "Warehouse Updated" : "Warehouse Created"}</h2>
             <p className="mt-2 text-sm leading-relaxed text-[#6B7280]">
               <span className="font-semibold text-black">{name.trim()}</span>{" "}
               {initial ? "has been updated successfully." : "has been registered and is now active."}
@@ -119,19 +119,19 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
       <ModalShell open={open} onClose={onClose} maxWidth="max-w-[500px]">
         <div className="p-6">
           <h2 className="text-lg font-bold text-black">
-            {initial ? "Edit Distribution Hub" : "Register New Distribution Hub"}
+            {initial ? "Edit Warehouse" : "Register New Warehouse"}
           </h2>
 
           <div className="mt-5 flex flex-col gap-4">
             <div>
               <label className="text-sm font-semibold text-black">
-                Hub Name <span className="text-[#EF4444]">*</span>
+                Warehouse Name <span className="text-[#EF4444]">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="e.g., Whitefield Logistics Center"
+                placeholder="e.g., Whitefield Warehouse"
                 className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
               />
             </div>

@@ -82,7 +82,7 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#FEF3E2]">
           <ShieldCheck className="h-6 w-6 text-[#F7931E]" strokeWidth={2} />
         </div>
-        <h2 className="mt-4 text-2xl font-bold text-black">Register Hub Administrator</h2>
+        <h2 className="mt-4 text-2xl font-bold text-black">Register Warehouse Administrator</h2>
         <p className="mt-1.5 text-sm text-[#6B7280]">Generate secure credentials for a new warehouse manager.</p>
 
         <div className="mt-6 flex flex-col gap-4 text-left">
@@ -107,7 +107,7 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-black">Assign to Distribution Hub</label>
+            <label className="text-sm font-semibold text-black">Assign to Warehouse</label>
             <select
               value={hubId}
               onChange={(event) => setHubId(event.target.value)}

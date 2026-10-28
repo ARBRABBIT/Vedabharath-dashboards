@@ -4,6 +4,7 @@ import { ChevronDown, FileText, Filter, MapPin, Phone, Search } from "lucide-rea
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
+import { CreateOrderFAB } from "@/components/super-admin/orders/CreateOrderFAB";
 import { DEFAULT_WAREHOUSES, EMPTY_FILTERS, FiltersModal, type OrderFilters } from "@/components/super-admin/orders/FiltersModal";
 import { OrderDetailModal } from "@/components/super-admin/orders/OrderDetailModal";
 import { INITIAL_ORDERS, statusPillClasses, type Order } from "@/components/super-admin/orders/ordersData";
@@ -246,6 +247,7 @@ export default function UserManagementOrdersPage() {
       />
 
       <OrderDetailModal order={viewingOrder} open={viewingOrder !== null} onClose={() => setViewingOrder(null)} />
+      <CreateOrderFAB />
     </div>
   );
 }

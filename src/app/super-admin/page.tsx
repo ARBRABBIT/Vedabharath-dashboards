@@ -3,6 +3,7 @@ import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
 import { ActiveOffersCard } from "@/components/super-admin/ActiveOffersCard";
 import { ActiveSupportTicketsCard } from "@/components/super-admin/ActiveSupportTicketsCard";
 import { CustomerReviewsCard } from "@/components/super-admin/CustomerReviewsCard";
+import { CreateOrderFAB } from "@/components/super-admin/orders/CreateOrderFAB";
 import { TopSellingProductsCard } from "@/components/super-admin/TopSellingProductsCard";
 
 export const metadata: Metadata = {
@@ -25,6 +26,8 @@ export default function SuperAdminPage() {
           <CustomerReviewsCard />
         </div>
       </main>
+
+      <CreateOrderFAB />
     </div>
   );
 }

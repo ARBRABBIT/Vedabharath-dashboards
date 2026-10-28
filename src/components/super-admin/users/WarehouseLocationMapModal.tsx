@@ -472,87 +472,67 @@ export function WarehouseLocationMapModal({
             className="flex w-full max-w-[880px] flex-col overflow-hidden rounded-[28px] border border-[#E5E7EB] bg-white shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#F3F4F6] px-6 py-4">
-              <div>
+            <div className="flex items-center justify-between gap-4 border-b border-[#F3F4F6] px-6 py-4">
+              <div className="min-w-0">
                 <h3 className="text-lg font-bold text-black">Select Warehouse Location</h3>
                 <p className="text-xs text-[#6B7280]">
-                  Click anywhere on the map or select a hub to pin the distribution location.
+                  Click anywhere on the map or search a hub to pin the distribution location.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-[#9CA3AF] transition-colors hover:bg-[#F3F4F6] hover:text-black"
-              >
-                <X className="h-5 w-5" strokeWidth={2} />
-              </button>
-            </div>
 
-            {/* Search Bar & Quick Zone Filter Chips */}
-            <div className="border-b border-[#F3F4F6] bg-[#FAFAFA] px-6 py-3">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search hub name, area, or city (e.g. Whitefield, Peenya, Gachibowli)..."
-                  className="w-full rounded-full border border-[#E5E7EB] bg-white py-2 pl-10 pr-10 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF] hover:text-black"
-                  >
-                    Clear
-                  </button>
-                )}
-
-                {/* Dropdown search suggestions */}
-                {searchResults.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-48 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-1.5 shadow-xl">
-                    {searchResults.map((result) => (
-                      <button
-                        key={result.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveLocation(result);
-                          setSearchQuery("");
-                        }}
-                        className="flex w-full cursor-pointer items-start gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-[#FEF3E2]"
-                      >
-                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#F7931E]" />
-                        <div>
-                          <p className="text-xs font-bold text-black">{result.name}</p>
-                          <p className="truncate text-[11px] text-[#6B7280]">{result.fullAddress}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Quick Preset Chips */}
-              <div className="mt-2.5 flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-                <span className="shrink-0 font-medium text-[#9CA3AF]">Quick Hubs:</span>
-                {WAREHOUSE_PRESETS.map((preset) => {
-                  const isSelected = activeLocation.id === preset.id;
-                  return (
+              <div className="flex items-center gap-3 shrink-0">
+                {/* Search Bar */}
+                <div className="relative w-60 sm:w-72">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search hub or location..."
+                    className="w-full rounded-full border border-[#E5E7EB] bg-white py-1.5 pl-9 pr-8 text-xs outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                  />
+                  {searchQuery && (
                     <button
-                      key={preset.id}
                       type="button"
-                      onClick={() => setActiveLocation(preset)}
-                      className={`shrink-0 cursor-pointer rounded-full px-3 py-1 font-semibold transition-all ${
-                        isSelected
-                          ? "bg-[#F7931E] text-white shadow-sm"
-                          : "border border-[#E5E7EB] bg-white text-[#374151] hover:bg-[#F3F4F6]"
-                      }`}
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF] hover:text-black"
                     >
-                      {preset.name.split(" ")[0]}
+                      ✕
                     </button>
-                  );
-                })}
+                  )}
+
+                  {/* Dropdown search suggestions */}
+                  {searchResults.length > 0 && (
+                    <div className="absolute right-0 top-full z-30 mt-1.5 w-72 max-h-56 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-1.5 shadow-xl">
+                      {searchResults.map((result) => (
+                        <button
+                          key={result.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveLocation(result);
+                            setSearchQuery("");
+                          }}
+                          className="flex w-full cursor-pointer items-start gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-[#FEF3E2]"
+                        >
+                          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#F7931E]" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-black truncate">{result.name}</p>
+                            <p className="truncate text-[11px] text-[#6B7280]">{result.fullAddress}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-[#9CA3AF] transition-colors hover:bg-[#F3F4F6] hover:text-black"
+                >
+                  <X className="h-5 w-5" strokeWidth={2} />
+                </button>
               </div>
             </div>
 

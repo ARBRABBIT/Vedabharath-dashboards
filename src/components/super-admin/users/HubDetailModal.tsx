@@ -53,9 +53,14 @@ export function HubDetailModal({ hub, admins, open, onClose, onSelectAdmin }: Hu
           {/* Left: Facility Address & Map */}
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Facility Address</p>
-            <div className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-[#374151]">
-              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#F7931E]" strokeWidth={2} />
-              <span>{hub.facilityAddress}</span>
+            <div className="relative mt-2">
+              <MapPin className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#F7931E]" strokeWidth={2} />
+              <textarea
+                readOnly
+                rows={2}
+                value={hub.facilityAddress}
+                className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] py-2 pl-9 pr-3 text-xs font-medium leading-relaxed text-[#1F2937] outline-none"
+              />
             </div>
 
             <div className="relative mt-3 flex h-[130px] w-full items-center justify-center overflow-hidden rounded-2xl bg-[#EEF2F1]">

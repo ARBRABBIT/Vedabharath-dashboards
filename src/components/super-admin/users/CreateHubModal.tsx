@@ -124,7 +124,9 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
 
           <div className="mt-5 flex flex-col gap-4">
             <div>
-              <label className="text-sm font-semibold text-black">Hub Name</label>
+              <label className="text-sm font-semibold text-black">
+                Hub Name <span className="text-[#EF4444]">*</span>
+              </label>
               <input
                 type="text"
                 value={name}

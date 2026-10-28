@@ -16,6 +16,7 @@ export type HubFormData = {
   zone: string;
   address: string;
   adminId: string;
+  capacity?: number;
   coordinates?: string;
   geoTags?: string;
   mapLink?: string;
@@ -32,6 +33,7 @@ type CreateHubModalProps = {
 export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: CreateHubModalProps) {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [capacity, setCapacity] = useState("");
   const [coordinates, setCoordinates] = useState("");
   const [geoTags, setGeoTags] = useState("");
   const [mapLink, setMapLink] = useState("");
@@ -44,6 +46,7 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
     if (!open) return;
     setName(initial?.name ?? "");
     setAddress(initial?.facilityAddress ?? "");
+    setCapacity(initial?.totalInventoryVolumeKg ? String(initial.totalInventoryVolumeKg) : "");
     setCoordinates(initial ? "12.9850° N, 77.7400° E" : "");
     setGeoTags(initial ? "#EastBangalore, #Logistics" : "");
     setMapLink(initial ? `https://maps.google.com/?q=${encodeURIComponent(initial.facilityAddress)}` : "");
@@ -73,6 +76,7 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
       zone: zoneName,
       address: address.trim(),
       adminId,
+      capacity: capacity ? Number(capacity) : undefined,
       coordinates: coordinates.trim(),
       geoTags: geoTags.trim(),
       mapLink: mapLink.trim(),
@@ -119,94 +123,117 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
 
   return (
     <>
-      <ModalShell open={open} onClose={onClose} maxWidth="max-w-[500px]">
-        <div className="p-6">
-          <h2 className="text-lg font-bold text-black">
+      <ModalShell open={open} onClose={onClose} maxWidth="max-w-[760px]">
+        <div className="max-h-[88vh] overflow-y-auto p-6 sm:p-7">
+          <h2 className="text-xl font-bold text-black">
             {initial ? "Edit Warehouse" : "Register New Warehouse"}
           </h2>
 
-          <div className="mt-5 flex flex-col gap-4">
-            <div>
-              <label className="text-sm font-semibold text-black">
-                Warehouse Name <span className="text-[#EF4444]">*</span>
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="e.g., Whitefield Warehouse"
-                className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-              />
-            </div>
-
-            {/* Warehouse Map Location Picker */}
-            <div>
-              <label className="block text-sm font-semibold text-black pb-1.5">Warehouse Location on Map</label>
-              <WarehouseMapInlinePicker
-                selectedAddress={address}
-                onOpenEnlarge={() => setMapModalOpen(true)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-black">Full Address</label>
-              <textarea
-                value={address}
-                onChange={(event) => setAddress(event.target.value)}
-                placeholder="e.g., Plot 45, Industrial Area..."
-                rows={3}
-                className="mt-1.5 w-full resize-none rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-              />
-              <p className="mt-1 text-[11px] text-[#9CA3AF]">
-                Pin a location on the map above or edit full address details directly.
-              </p>
-            </div>
-
-            {/* Geo Tags & Coordinates */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+            {/* Left Column: Warehouse Location on Map & Full Address */}
+            <div className="flex flex-col gap-4">
               <div>
-                <label className="text-sm font-semibold text-black">Coordinates</label>
+                <label className="block text-sm font-semibold text-black pb-1.5">
+                  Warehouse Location on Map
+                </label>
+                <WarehouseMapInlinePicker
+                  selectedAddress={address}
+                  onOpenEnlarge={() => setMapModalOpen(true)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-black">Full Address</label>
+                <textarea
+                  value={address}
+                  onChange={(event) => setAddress(event.target.value)}
+                  placeholder="e.g., Plot 45, Industrial Area..."
+                  rows={3}
+                  className="mt-1.5 w-full resize-none rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                />
+                <p className="mt-1 text-[11px] text-[#9CA3AF]">
+                  Pin a location on the map above or edit full address details directly.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Warehouse Name, Capacity, Coordinates, Geo Tags, Map Link */}
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-semibold text-black">
+                  Warehouse Name <span className="text-[#EF4444]">*</span>
+                </label>
                 <input
                   type="text"
-                  value={coordinates}
-                  onChange={(event) => setCoordinates(event.target.value)}
-                  placeholder="e.g., 12.9850° N, 77.7400° E"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="e.g., Whitefield Warehouse"
                   className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-black">Geo Tags</label>
+                <label className="text-sm font-semibold text-black">Warehouse Capacity</label>
                 <input
                   type="text"
-                  value={geoTags}
-                  onChange={(event) => setGeoTags(event.target.value)}
-                  placeholder="e.g., #Industrial, #Logistics"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={capacity}
+                  onChange={(event) => {
+                    const onlyNums = event.target.value.replace(/\D/g, "");
+                    setCapacity(onlyNums);
+                  }}
+                  placeholder="e.g., 5000"
+                  className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                />
+              </div>
+
+              {/* Geo Tags & Coordinates */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm font-semibold text-black">Coordinates</label>
+                  <input
+                    type="text"
+                    value={coordinates}
+                    onChange={(event) => setCoordinates(event.target.value)}
+                    placeholder="e.g., 12.9850° N, 77.7400° E"
+                    className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-3.5 py-2.5 text-xs sm:text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold text-black">Geo Tags</label>
+                  <input
+                    type="text"
+                    value={geoTags}
+                    onChange={(event) => setGeoTags(event.target.value)}
+                    placeholder="e.g., #Industrial"
+                    className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-3.5 py-2.5 text-xs sm:text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                  />
+                </div>
+              </div>
+
+              {/* Map Link */}
+              <div>
+                <label className="text-sm font-semibold text-black">Map Link</label>
+                <input
+                  type="text"
+                  value={mapLink}
+                  onChange={(event) => setMapLink(event.target.value)}
+                  placeholder="e.g., https://maps.google.com/?q=..."
                   className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
                 />
               </div>
             </div>
-
-            {/* Map Link */}
-            <div>
-              <label className="text-sm font-semibold text-black">Map Link</label>
-              <input
-                type="text"
-                value={mapLink}
-                onChange={(event) => setMapLink(event.target.value)}
-                placeholder="e.g., https://maps.google.com/?q=..."
-                className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-              />
-            </div>
-
-            {error && (
-              <p className="rounded-xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#EF4444]">
-                Please fill in Warehouse Name and Full Address.
-              </p>
-            )}
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#F3F4F6] pt-5">
+          {error && (
+            <p className="mt-4 rounded-xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#EF4444]">
+              Please fill in Warehouse Name and Full Address.
+            </p>
+          )}
+
+          <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#F3F4F6] pt-4">
             <button
               type="button"
               onClick={onClose}

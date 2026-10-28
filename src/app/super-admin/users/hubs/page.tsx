@@ -95,7 +95,7 @@ export default function HighPerformingHubsPage() {
                 className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full bg-[#F7931E] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Create New Hub
+                Create New Warehouse
               </button>
             </div>
           }
@@ -104,7 +104,7 @@ export default function HighPerformingHubsPage() {
         {/* Top 4 Performance Summary Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Hubs</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Warehouses</p>
             <div>
               <p className="mt-1.5 text-3xl font-bold text-black">{hubs.length + 18}</p>
               <p className="mt-0.5 text-xs text-[#6B7280]">Regional distribution centers</p>

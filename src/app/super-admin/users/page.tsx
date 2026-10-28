@@ -135,7 +135,7 @@ export default function UserManagementPage() {
               className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB]"
             >
               <Building2 className="h-4 w-4 text-[#6B7280]" strokeWidth={2} />
-              Create New Hub
+              Create New Warehouse
             </button>
             <button
               type="button"
@@ -150,7 +150,7 @@ export default function UserManagementPage() {
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Hubs</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Warehouses</p>
             <div>
               <p className="mt-1.5 text-3xl font-bold text-black">{hubs.length + 18}</p>
             </div>
@@ -163,7 +163,7 @@ export default function UserManagementPage() {
           </div>
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">High Performing Hub</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">High Performing Warehouse</p>
               <Link
                 href="/super-admin/users/hubs"
                 className="cursor-pointer text-xs font-semibold text-[#F7931E] hover:underline"

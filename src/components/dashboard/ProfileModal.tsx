@@ -5,7 +5,18 @@ import { LogOut, X } from "lucide-react";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 
-export const PROFILE = {
+export type UserProfile = {
+  name: string;
+  title: string;
+  initials: string;
+  email: string;
+  phone: string;
+  role: string;
+  assignedWarehouse?: string;
+  status: string;
+};
+
+export const WAREHOUSE_PROFILE: UserProfile = {
   name: "Sriraj Yadav",
   title: "Operations Administrator",
   initials: "SY",
@@ -16,10 +27,24 @@ export const PROFILE = {
   status: "Active",
 };
 
+export const SUPER_ADMIN_PROFILE: UserProfile = {
+  name: "Sriraj Yadav",
+  title: "Super Administrator",
+  initials: "SY",
+  email: "superadmin@vedabharath.com",
+  phone: "+91 98765 43210",
+  role: "Super Admin",
+  status: "Active",
+};
+
+export const PROFILE = WAREHOUSE_PROFILE;
+
 type ProfileModalProps = {
   open: boolean;
   onClose: () => void;
   onRequestLogout: () => void;
+  variant?: "warehouse" | "super-admin";
+  profile?: UserProfile;
   warehouseName?: string;
 };
 
@@ -34,7 +59,17 @@ function ProfileField({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-export function ProfileModal({ open, onClose, onRequestLogout, warehouseName }: ProfileModalProps) {
+export function ProfileModal({
+  open,
+  onClose,
+  onRequestLogout,
+  variant = "warehouse",
+  profile: customProfile,
+  warehouseName,
+}: ProfileModalProps) {
+  const activeProfile =
+    customProfile ?? (variant === "super-admin" ? SUPER_ADMIN_PROFILE : WAREHOUSE_PROFILE);
+
   useEffect(() => {
     if (!open) return;
 
@@ -84,23 +119,23 @@ export function ProfileModal({ open, onClose, onRequestLogout, warehouseName }: 
             <div className="flex flex-col items-center gap-1 px-8 pb-5 pt-9">
               <div className="flex h-20 w-20 items-center justify-center rounded-full border-[3px] border-[#F5A623] p-[3px]">
                 <div className="flex h-full w-full items-center justify-center rounded-full bg-[#F9A51A] text-xl font-bold text-white">
-                  {PROFILE.initials}
+                  {activeProfile.initials}
                 </div>
               </div>
-              <h2 className="mt-2.5 text-lg font-bold text-[#171D15]">{PROFILE.name}</h2>
-              <p className="text-sm font-medium text-[#3E4A3C]">{PROFILE.title}</p>
+              <h2 className="mt-2.5 text-lg font-bold text-[#171D15]">{activeProfile.name}</h2>
+              <p className="text-sm font-medium text-[#3E4A3C]">{activeProfile.title}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-x-6 gap-y-5 px-8 pb-6">
-              <ProfileField label="Email Address" value={PROFILE.email} />
-              <ProfileField label="Phone Number" value={PROFILE.phone} />
-              <ProfileField label="Assigned Role" value={PROFILE.role} />
-              {PROFILE.role === "Operations Lead" ? (
+              <ProfileField label="Email Address" value={activeProfile.email} />
+              <ProfileField label="Phone Number" value={activeProfile.phone} />
+              <ProfileField label="Assigned Role" value={activeProfile.role} />
+              {variant === "warehouse" ? (
                 <ProfileField
                   label="Assigned Warehouse"
                   value={
                     <span className="text-sm font-semibold text-[#171D15] leading-snug">
-                      {warehouseName ?? PROFILE.assignedWarehouse}
+                      {warehouseName ?? activeProfile.assignedWarehouse ?? "Gachibowli Distribution Warehouse"}
                     </span>
                   }
                 />
@@ -109,7 +144,7 @@ export function ProfileModal({ open, onClose, onRequestLogout, warehouseName }: 
                   label="Account Status"
                   value={
                     <span className="inline-flex w-fit items-center rounded-full bg-[#EBF7EC] px-2 py-0.5 text-xs font-bold text-[#3BB54A]">
-                      {PROFILE.status}
+                      {activeProfile.status}
                     </span>
                   }
                 />

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { LogoutConfirmModal } from "./LogoutConfirmModal";
-import { PROFILE, ProfileModal } from "./ProfileModal";
+import { SUPER_ADMIN_PROFILE, ProfileModal } from "./ProfileModal";
 import {
   INITIAL_SUPER_ADMIN_NOTIFICATIONS,
   SuperAdminNotificationsPanel,
@@ -153,7 +153,7 @@ export function SuperAdminNavbar() {
           aria-label="View profile"
           className="flex h-[54.74px] w-[54.74px] cursor-pointer items-center justify-center rounded-full border-2 border-[#F5A623] bg-[#F9A51A]"
         >
-          <span className="text-lg font-semibold text-white">{PROFILE.initials}</span>
+          <span className="text-lg font-semibold text-white">{SUPER_ADMIN_PROFILE.initials}</span>
         </button>
 
         <button
@@ -169,6 +169,7 @@ export function SuperAdminNavbar() {
       <ProfileModal
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
+        variant="super-admin"
         onRequestLogout={() => {
           setProfileOpen(false);
           setLogoutConfirmOpen(true);

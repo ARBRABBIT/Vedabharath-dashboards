@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { LogoutConfirmModal } from "./LogoutConfirmModal";
 import { NOTIFICATIONS, NotificationsPanel } from "./NotificationsPanel";
-import { PROFILE, ProfileModal } from "./ProfileModal";
+import { WAREHOUSE_PROFILE, ProfileModal } from "./ProfileModal";
 
 type NavItem = { label: string; href: string | null };
 
@@ -136,7 +136,7 @@ export function DashboardNavbar() {
           aria-label="View profile"
           className="flex h-[54.74px] w-[54.74px] cursor-pointer items-center justify-center rounded-full border-2 border-[#F5A623] bg-[#F9A51A]"
         >
-          <span className="text-lg font-semibold text-white">{PROFILE.initials}</span>
+          <span className="text-lg font-semibold text-white">{WAREHOUSE_PROFILE.initials}</span>
         </button>
 
         <button
@@ -152,6 +152,7 @@ export function DashboardNavbar() {
       <ProfileModal
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
+        variant="warehouse"
         onRequestLogout={() => {
           setProfileOpen(false);
           setLogoutConfirmOpen(true);

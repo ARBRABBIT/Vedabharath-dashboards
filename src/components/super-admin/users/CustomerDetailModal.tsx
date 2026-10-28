@@ -51,24 +51,52 @@ export function CustomerDetailModal({ customer, open, onClose }: CustomerDetailM
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Contact Information</p>
-            <div className="mt-3 flex items-center gap-2.5 text-sm text-[#374151]">
-              <Mail className="h-4 w-4 shrink-0 text-[#6B7280]" strokeWidth={2} />
-              {customer.email}
-            </div>
-            <div className="mt-2.5 flex items-center gap-2.5 text-sm text-[#374151]">
-              <Phone className="h-4 w-4 shrink-0 text-[#6B7280]" strokeWidth={2} />
-              {customer.phone}
+        <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-[0.95fr_1.05fr]">
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">Contact Information</p>
+              <div className="mt-3 flex flex-col gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-[#374151]">Email Address</label>
+                  <div className="relative mt-1 flex items-center">
+                    <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" strokeWidth={2} />
+                    <input
+                      type="text"
+                      readOnly
+                      value={customer.email}
+                      className="w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] py-2.5 pl-10 pr-3.5 text-sm text-[#1F2937] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-[#374151]">Phone Number</label>
+                  <div className="relative mt-1 flex items-center">
+                    <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" strokeWidth={2} />
+                    <input
+                      type="text"
+                      readOnly
+                      value={customer.phone}
+                      className="w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] py-2.5 pl-10 pr-3.5 text-sm text-[#1F2937] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p className="mt-6 text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
-              Primary Shipping Address
-            </p>
-            <div className="mt-3 flex max-w-[220px] items-start gap-2.5 text-sm leading-relaxed text-[#374151]">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#6B7280]" strokeWidth={2} />
-              {customer.address}
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
+                Primary Shipping Address
+              </p>
+              <div className="relative mt-2">
+                <MapPin className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-[#9CA3AF]" strokeWidth={2} />
+                <textarea
+                  readOnly
+                  rows={3}
+                  value={customer.address}
+                  className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] py-2.5 pl-10 pr-3.5 text-sm leading-relaxed text-[#1F2937] outline-none"
+                />
+              </div>
             </div>
           </div>
 

@@ -49,9 +49,9 @@ type CreateOrderModalProps = {
 export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderModalProps) {
   // Mode: existing or new customer
   const [customerMode, setCustomerMode] = useState<"existing" | "new">("existing");
-  const [isSelectingCustomer, setIsSelectingCustomer] = useState(false);
+  const [isSelectingCustomer, setIsSelectingCustomer] = useState(true);
   const [customerSearch, setCustomerSearch] = useState("");
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(CUSTOMERS[0]?.id ?? "");
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
 
   // New customer form fields
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -60,25 +60,13 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
   const [newCustomerAddress, setNewCustomerAddress] = useState("");
 
   // Selected warehouse
-  const [selectedWarehouse, setSelectedWarehouse] = useState<string>(
-    INITIAL_HUBS[0]?.name ?? "Gachibowli Distribution Warehouse",
-  );
+  const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
 
   // Payment method
   const [paymentMethod, setPaymentMethod] = useState("Prepaid (UPI)");
 
-  // Order Items
-  const defaultProduct = PRODUCTS[0];
-  const [items, setItems] = useState<OrderItemEntry[]>([
-    {
-      id: "item-1",
-      sku: defaultProduct?.sku ?? "VB-NAV",
-      name: defaultProduct?.name ?? "Navara Rice",
-      variant: defaultProduct?.variants[0] ?? "1kg",
-      price: defaultProduct?.price ?? 299,
-      qty: 1,
-    },
-  ]);
+  // Order Items (starts empty)
+  const [items, setItems] = useState<OrderItemEntry[]>([]);
 
   // UI state
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -92,33 +80,24 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
     total: number;
   } | null>(null);
 
-  // Reset form when modal opens
+  // Reset form when modal opens: everything starts completely empty
   useEffect(() => {
     if (!open) return;
     setCustomerMode("existing");
-    setIsSelectingCustomer(false);
+    setIsSelectingCustomer(true);
     setCustomerSearch("");
-    setSelectedCustomerId(CUSTOMERS[0]?.id ?? "");
+    setSelectedCustomerId("");
     setNewCustomerName("");
     setNewCustomerEmail("");
     setNewCustomerPhone("");
     setNewCustomerAddress("");
-    setSelectedWarehouse(INITIAL_HUBS[0]?.name ?? "Gachibowli Distribution Warehouse");
+    setSelectedWarehouse("");
     setPaymentMethod("Prepaid (UPI)");
-    setItems([
-      {
-        id: `item-${Date.now()}`,
-        sku: defaultProduct?.sku ?? "VB-NAV",
-        name: defaultProduct?.name ?? "Navara Rice",
-        variant: defaultProduct?.variants[0] ?? "1kg",
-        price: defaultProduct?.price ?? 299,
-        qty: 1,
-      },
-    ]);
+    setItems([]);
     setErrorMessage(null);
     setStep("form");
     setCreatedOrderSummary(null);
-  }, [open, defaultProduct]);
+  }, [open]);
 
   // Filtered existing customers
   const filteredCustomers = useMemo(() => {
@@ -133,7 +112,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
   }, [customerSearch]);
 
   const selectedCustomer = useMemo(
-    () => CUSTOMERS.find((c) => c.id === selectedCustomerId) ?? CUSTOMERS[0],
+    () => CUSTOMERS.find((c) => c.id === selectedCustomerId) ?? null,
     [selectedCustomerId],
   );
 
@@ -204,7 +183,6 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
   }
 
   function handleRemoveItem(itemId: string) {
-    if (items.length <= 1) return;
     setItems((prev) => prev.filter((item) => item.id !== itemId));
   }
 
@@ -646,10 +624,15 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
                 <select
                   value={selectedWarehouse}
                   onChange={(e) => setSelectedWarehouse(e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] px-3.5 py-2.5 pr-10 text-xs font-medium text-[#1D1D1F] focus:border-[#F7931E] focus:bg-white focus:outline-none cursor-pointer transition"
+                  className={`w-full appearance-none rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] px-3.5 py-2.5 pr-10 text-xs font-medium focus:border-[#F7931E] focus:bg-white focus:outline-none cursor-pointer transition ${
+                    !selectedWarehouse ? "text-[#9CA3AF]" : "text-[#1D1D1F]"
+                  }`}
                 >
+                  <option value="" disabled>
+                    Select fulfillment warehouse...
+                  </option>
                   {INITIAL_HUBS.map((hub) => (
-                    <option key={hub.id} value={hub.name}>
+                    <option key={hub.id} value={hub.name} className="text-[#1D1D1F]">
                       {hub.name} ({hub.address})
                     </option>
                   ))}
@@ -664,83 +647,101 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
                 <label className="text-xs font-bold uppercase tracking-wider text-[#6E7B6A]">
                   3. Select Products & Quantity <span className="text-red-500">*</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={handleAddItem}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#F7931E] hover:text-[#E08217] transition"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  Add Product
-                </button>
+                {items.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#F7931E] hover:text-[#E08217] transition"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Product
+                  </button>
+                )}
               </div>
 
-              <div className="space-y-2.5">
-                {items.map((item, idx) => {
-                  const currentProd = PRODUCTS.find((p) => p.sku === item.sku);
-                  const availableVariants = currentProd?.variants ?? ["1kg", "5kg"];
+              {items.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#D1D5DB] bg-[#FAFAFA] py-6 px-4 text-center">
+                  <Package className="h-6 w-6 text-[#9CA3AF] mb-1.5" />
+                  <p className="text-xs font-semibold text-[#1D1D1F]">No products selected</p>
+                  <p className="text-[11px] text-[#8E8E93] mt-0.5">
+                    Click &ldquo;+ Add Product&rdquo; to add rice products to this order.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white border border-[#E5E7EB] px-4 py-1.5 text-xs font-semibold text-[#F7931E] shadow-sm hover:border-[#F7931E] transition cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Product
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {items.map((item) => {
+                    const currentProd = PRODUCTS.find((p) => p.sku === item.sku);
+                    const availableVariants = currentProd?.variants ?? ["1kg", "5kg"];
 
-                  return (
-                    <div
-                      key={item.id}
-                      className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-3 text-xs"
-                    >
-                      {/* Product Dropdown */}
-                      <div className="flex-1 min-w-[180px]">
-                        <select
-                          value={item.sku}
-                          onChange={(e) => handleProductChange(item.id, e.target.value)}
-                          className="w-full rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1D1D1F] focus:border-[#F7931E] focus:outline-none"
-                        >
-                          {PRODUCTS.map((prod) => (
-                            <option key={prod.sku} value={prod.sku}>
-                              {prod.name} (Base ₹{prod.price})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-3 text-xs"
+                      >
+                        {/* Product Dropdown */}
+                        <div className="flex-1 min-w-[180px]">
+                          <select
+                            value={item.sku}
+                            onChange={(e) => handleProductChange(item.id, e.target.value)}
+                            className="w-full rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1D1D1F] focus:border-[#F7931E] focus:outline-none"
+                          >
+                            {PRODUCTS.map((prod) => (
+                              <option key={prod.sku} value={prod.sku}>
+                                {prod.name} (Base ₹{prod.price})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                      {/* Variant Dropdown */}
-                      <div className="w-24">
-                        <select
-                          value={item.variant}
-                          onChange={(e) => handleVariantChange(item.id, e.target.value)}
-                          className="w-full rounded-lg border border-[#E5E7EB] bg-white px-2 py-1.5 text-xs text-[#1D1D1F] focus:border-[#F7931E] focus:outline-none"
-                        >
-                          {availableVariants.map((v) => (
-                            <option key={v} value={v}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                        {/* Variant Dropdown */}
+                        <div className="w-24">
+                          <select
+                            value={item.variant}
+                            onChange={(e) => handleVariantChange(item.id, e.target.value)}
+                            className="w-full rounded-lg border border-[#E5E7EB] bg-white px-2 py-1.5 text-xs text-[#1D1D1F] focus:border-[#F7931E] focus:outline-none"
+                          >
+                            {availableVariants.map((v) => (
+                              <option key={v} value={v}>
+                                {v}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                      {/* Quantity Stepper */}
-                      <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-2 py-1">
-                        <button
-                          type="button"
-                          onClick={() => handleQtyChange(item.id, -1)}
-                          disabled={item.qty <= 1}
-                          className="p-0.5 text-[#8E8E93] hover:text-[#1D1D1F] disabled:opacity-40"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-6 text-center font-bold text-xs text-[#1D1D1F]">{item.qty}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleQtyChange(item.id, 1)}
-                          className="p-0.5 text-[#8E8E93] hover:text-[#1D1D1F]"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
-                      </div>
+                        {/* Quantity Stepper */}
+                        <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-2 py-1">
+                          <button
+                            type="button"
+                            onClick={() => handleQtyChange(item.id, -1)}
+                            disabled={item.qty <= 1}
+                            className="p-0.5 text-[#8E8E93] hover:text-[#1D1D1F] disabled:opacity-40"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-6 text-center font-bold text-xs text-[#1D1D1F]">{item.qty}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleQtyChange(item.id, 1)}
+                            className="p-0.5 text-[#8E8E93] hover:text-[#1D1D1F]"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
 
-                      {/* Price subtotal */}
-                      <div className="min-w-[70px] text-right font-semibold text-[#1D1D1F]">
-                        ₹{(item.price * item.qty).toLocaleString()}
-                      </div>
+                        {/* Price subtotal */}
+                        <div className="min-w-[70px] text-right font-semibold text-[#1D1D1F]">
+                          ₹{(item.price * item.qty).toLocaleString()}
+                        </div>
 
-                      {/* Delete button */}
-                      {items.length > 1 && (
+                        {/* Delete button */}
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(item.id)}
@@ -749,11 +750,11 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Order calculation summary box */}
               <div className="mt-4 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-3 text-xs space-y-1.5">
@@ -815,7 +816,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
               className="inline-flex items-center gap-2 rounded-full bg-[#F7931E] px-6 py-2.5 text-xs font-semibold text-white shadow-[0_4px_14px_rgba(247,147,30,0.35)] hover:bg-[#E08217] active:scale-95 transition cursor-pointer"
             >
               <Package className="h-4 w-4" />
-              Create Order • ₹{grandTotal.toLocaleString()}
+              <span>{grandTotal > 0 ? `Create Order • ₹${grandTotal.toLocaleString()}` : "Create Order"}</span>
             </button>
           </div>
         </div>

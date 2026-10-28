@@ -19,10 +19,245 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ModalShell } from "@/components/orders/modals/ModalShell";
 import { PRODUCTS, type SuperAdminProduct } from "@/components/super-admin/products/productsData";
 import { CUSTOMERS, INITIAL_HUBS, type Customer, type Hub } from "@/components/super-admin/users/usersData";
+
+function WarehouseDropdown({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  options: Hub[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find((h) => h.name === value);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex w-full cursor-pointer items-center justify-between rounded-xl border py-2.5 px-3.5 text-left text-xs transition ${
+          open
+            ? "border-[#F7931E] bg-white ring-2 ring-[#F7931E]/20"
+            : "border-[#E5E7EB] bg-[#FAFAFA] hover:bg-white"
+        }`}
+      >
+        {selected ? (
+          <div className="min-w-0 pr-2">
+            <span className="font-semibold text-[#1D1D1F] block truncate">{selected.name}</span>
+            <span className="text-[11px] text-[#6E7B6A] block truncate">{selected.address}</span>
+          </div>
+        ) : (
+          <span className="text-[#9CA3AF] font-normal">Select fulfillment warehouse...</span>
+        )}
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-[#8E8E93] transition-transform duration-200 ${
+            open ? "rotate-180 text-[#F7931E]" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-40 mt-1.5 max-h-60 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.14)]">
+          {options.map((hub) => {
+            const isSelected = hub.name === value;
+            return (
+              <button
+                key={hub.id}
+                type="button"
+                onClick={() => {
+                  onChange(hub.name);
+                  setOpen(false);
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition ${
+                  isSelected
+                    ? "bg-[#FFF8F0] text-[#F7931E]"
+                    : "text-[#1D1D1F] hover:bg-[#F5F5F7]"
+                }`}
+              >
+                <div className="min-w-0 pr-2">
+                  <p className={`font-semibold ${isSelected ? "text-[#F7931E]" : "text-[#1D1D1F]"}`}>
+                    {hub.name}
+                  </p>
+                  <p className="text-[11px] text-[#6E7B6A] truncate">{hub.address}</p>
+                </div>
+                {isSelected && <Check className="h-4 w-4 shrink-0 text-[#F7931E]" strokeWidth={2.5} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProductDropdown({
+  value,
+  onChange,
+  products,
+}: {
+  value: string;
+  onChange: (sku: string) => void;
+  products: SuperAdminProduct[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = products.find((p) => p.sku === value) ?? products[0];
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative flex-1 min-w-[180px]" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex w-full cursor-pointer items-center justify-between rounded-lg border bg-white px-2.5 py-1.5 text-left text-xs font-medium transition ${
+          open
+            ? "border-[#F7931E] ring-1 ring-[#F7931E]"
+            : "border-[#E5E7EB] hover:border-[#D1D5DB]"
+        }`}
+      >
+        <span className="truncate text-[#1D1D1F]">
+          {selected?.name} (Base ₹{selected?.price})
+        </span>
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-[#8E8E93] transition-transform ${
+            open ? "rotate-180 text-[#F7931E]" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded-xl border border-[#E5E7EB] bg-white p-1 shadow-[0_12px_32px_rgba(0,0,0,0.12)]">
+          {products.map((prod) => {
+            const isSelected = prod.sku === value;
+            return (
+              <button
+                key={prod.sku}
+                type="button"
+                onClick={() => {
+                  onChange(prod.sku);
+                  setOpen(false);
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition ${
+                  isSelected
+                    ? "bg-[#FFF8F0] text-[#F7931E] font-semibold"
+                    : "text-[#1D1D1F] hover:bg-[#F5F5F7]"
+                }`}
+              >
+                <div>
+                  <p className="font-semibold">{prod.name}</p>
+                  <p className="text-[10px] text-[#8E8E93]">{prod.subtitle}</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-[#1D1D1F]">₹{prod.price}</span>
+                  {isSelected && <Check className="h-3.5 w-3.5 text-[#F7931E]" strokeWidth={2.5} />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VariantDropdown({
+  value,
+  onChange,
+  variants,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  variants: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative w-24 shrink-0" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex w-full cursor-pointer items-center justify-between rounded-lg border bg-white px-2.5 py-1.5 text-left text-xs font-medium transition ${
+          open
+            ? "border-[#F7931E] ring-1 ring-[#F7931E]"
+            : "border-[#E5E7EB] hover:border-[#D1D5DB]"
+        }`}
+      >
+        <span className="text-[#1D1D1F] font-semibold">{value}</span>
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-[#8E8E93] transition-transform ${
+            open ? "rotate-180 text-[#F7931E]" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-40 mt-1 overflow-y-auto rounded-xl border border-[#E5E7EB] bg-white p-1 shadow-[0_12px_32px_rgba(0,0,0,0.12)]">
+          {variants.map((v) => {
+            const isSelected = v === value;
+            return (
+              <button
+                key={v}
+                type="button"
+                onClick={() => {
+                  onChange(v);
+                  setOpen(false);
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs transition ${
+                  isSelected
+                    ? "bg-[#FFF8F0] text-[#F7931E] font-semibold"
+                    : "text-[#1D1D1F] hover:bg-[#F5F5F7]"
+                }`}
+              >
+                <span>{v}</span>
+                {isSelected && <Check className="h-3 w-3 text-[#F7931E]" strokeWidth={2.5} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export type OrderItemEntry = {
   id: string;
@@ -620,25 +855,11 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
               <label className="block text-xs font-bold uppercase tracking-wider text-[#6E7B6A] mb-2">
                 2. Select Fulfillment Warehouse <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <select
-                  value={selectedWarehouse}
-                  onChange={(e) => setSelectedWarehouse(e.target.value)}
-                  className={`w-full appearance-none rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] px-3.5 py-2.5 pr-10 text-xs font-medium focus:border-[#F7931E] focus:bg-white focus:outline-none cursor-pointer transition ${
-                    !selectedWarehouse ? "text-[#9CA3AF]" : "text-[#1D1D1F]"
-                  }`}
-                >
-                  <option value="" disabled>
-                    Select fulfillment warehouse...
-                  </option>
-                  {INITIAL_HUBS.map((hub) => (
-                    <option key={hub.id} value={hub.name} className="text-[#1D1D1F]">
-                      {hub.name} ({hub.address})
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E8E93]" />
-              </div>
+              <WarehouseDropdown
+                value={selectedWarehouse}
+                onChange={setSelectedWarehouse}
+                options={INITIAL_HUBS}
+              />
             </div>
 
             {/* 3. Product Selection */}
@@ -686,35 +907,19 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
                         key={item.id}
                         className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-3 text-xs"
                       >
-                        {/* Product Dropdown */}
-                        <div className="flex-1 min-w-[180px]">
-                          <select
-                            value={item.sku}
-                            onChange={(e) => handleProductChange(item.id, e.target.value)}
-                            className="w-full rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1D1D1F] focus:border-[#F7931E] focus:outline-none"
-                          >
-                            {PRODUCTS.map((prod) => (
-                              <option key={prod.sku} value={prod.sku}>
-                                {prod.name} (Base ₹{prod.price})
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        {/* Product Custom Dropdown */}
+                        <ProductDropdown
+                          value={item.sku}
+                          onChange={(sku) => handleProductChange(item.id, sku)}
+                          products={PRODUCTS}
+                        />
 
-                        {/* Variant Dropdown */}
-                        <div className="w-24">
-                          <select
-                            value={item.variant}
-                            onChange={(e) => handleVariantChange(item.id, e.target.value)}
-                            className="w-full rounded-lg border border-[#E5E7EB] bg-white px-2 py-1.5 text-xs text-[#1D1D1F] focus:border-[#F7931E] focus:outline-none"
-                          >
-                            {availableVariants.map((v) => (
-                              <option key={v} value={v}>
-                                {v}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        {/* Variant Custom Dropdown */}
+                        <VariantDropdown
+                          value={item.variant}
+                          onChange={(v) => handleVariantChange(item.id, v)}
+                          variants={availableVariants}
+                        />
 
                         {/* Quantity Stepper */}
                         <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-2 py-1">

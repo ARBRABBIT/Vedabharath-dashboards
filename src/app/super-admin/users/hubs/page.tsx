@@ -29,13 +29,11 @@ import {
 import { PageHeader } from "@/components/super-admin/ui/PageHeader";
 
 type ViewMode = "table" | "grid";
-type StatusFilter = "All" | "Active" | "Inactive";
 
 export default function HighPerformingHubsPage() {
   const [hubs, setHubs] = useState<Hub[]>(INITIAL_HUBS);
   const [admins, setAdmins] = useState<Admin[]>(INITIAL_ADMINS);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
 
   // Modals
@@ -55,13 +53,11 @@ export default function HighPerformingHubsPage() {
         hub.name.toLowerCase().includes(search.toLowerCase()) ||
         hub.address.toLowerCase().includes(search.toLowerCase()) ||
         hub.highlyOrdered.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilter === "All" || hub.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     });
-  }, [sortedHubs, search, statusFilter]);
+  }, [sortedHubs, search]);
 
   const topHub = sortedHubs[0];
-  const activeCount = hubs.filter((h) => h.status === "Active").length;
 
   function handleCreateHub(data: HubFormData) {
     const newHubId = `hub-${hubs.length + 1}-${Date.now()}`;
@@ -108,10 +104,10 @@ export default function HighPerformingHubsPage() {
         {/* Top 4 Performance Summary Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Active Hubs</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Hubs</p>
             <div>
-              <p className="mt-1.5 text-3xl font-bold text-black">{activeCount + 18}</p>
-              <p className="mt-0.5 text-xs text-[#22C55E]">All hubs operational</p>
+              <p className="mt-1.5 text-3xl font-bold text-black">{hubs.length + 18}</p>
+              <p className="mt-0.5 text-xs text-[#6B7280]">Regional distribution centers</p>
             </div>
           </div>
 
@@ -151,7 +147,7 @@ export default function HighPerformingHubsPage() {
 
         {/* Filter and View Controls Bar */}
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-3">
             {/* Search */}
             <div className="relative">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
@@ -160,26 +156,8 @@ export default function HighPerformingHubsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search hubs, location, or crop..."
-                className="w-[260px] rounded-full border border-[#E5E7EB] bg-white py-2 pl-10 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                className="w-[300px] rounded-full border border-[#E5E7EB] bg-white py-2.5 pl-10 pr-4 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
               />
-            </div>
-
-            {/* Status Tabs */}
-            <div className="inline-flex items-center gap-1 rounded-full bg-white p-1 border border-[#E5E7EB]">
-              {(["All", "Active", "Inactive"] as StatusFilter[]).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setStatusFilter(tab)}
-                  className={`cursor-pointer rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                    statusFilter === tab
-                      ? "bg-[#F7931E] text-white shadow-sm"
-                      : "text-[#6B7280] hover:text-black"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -217,19 +195,18 @@ export default function HighPerformingHubsPage() {
                   <tr className="border-b border-[#F3F4F6] text-left text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
                     <th className="px-6 py-4">Rank</th>
                     <th className="px-4 py-4">Hub Name & Location</th>
-                    <th className="px-4 py-4">Status</th>
                     <th className="px-4 py-4">Stock Capacity</th>
                     <th className="px-4 py-4">Daily Volume</th>
                     <th className="px-4 py-4">Highly Ordered</th>
-                    <th className="px-4 py-4">Active Admins</th>
+                    <th className="px-4 py-4">Admins</th>
                     <th className="px-6 py-4 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredHubs.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-sm text-[#9CA3AF]">
-                        No distribution hubs match your search or filter.
+                      <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#9CA3AF]">
+                        No distribution hubs match your search.
                       </td>
                     </tr>
                   )}
@@ -277,19 +254,6 @@ export default function HighPerformingHubsPage() {
                           </div>
                         </td>
 
-                        {/* Status */}
-                        <td className="px-4 py-4">
-                          <span
-                            className={`inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                              hub.status === "Active"
-                                ? "bg-[#ECFDF5] text-[#10B981]"
-                                : "bg-[#F3F4F6] text-[#6B7280]"
-                            }`}
-                          >
-                            {hub.status}
-                          </span>
-                        </td>
-
                         {/* Stock Capacity Progress */}
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
@@ -321,7 +285,7 @@ export default function HighPerformingHubsPage() {
                           {hub.highlyOrdered}
                         </td>
 
-                        {/* Active Admins */}
+                        {/* Admins */}
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
                             <div className="flex -space-x-1.5 overflow-hidden">
@@ -390,15 +354,6 @@ export default function HighPerformingHubsPage() {
                           </p>
                         </div>
                       </div>
-                      <span
-                        className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                          hub.status === "Active"
-                            ? "bg-[#ECFDF5] text-[#10B981]"
-                            : "bg-[#F3F4F6] text-[#6B7280]"
-                        }`}
-                      >
-                        {hub.status}
-                      </span>
                     </div>
 
                     {/* Stats mini grid */}

@@ -150,9 +150,9 @@ export default function UserManagementPage() {
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Active Hubs</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">Total Hubs</p>
             <div>
-              <p className="mt-1.5 text-3xl font-bold text-black">{hubs.filter((h) => h.status === "Active").length + 18}</p>
+              <p className="mt-1.5 text-3xl font-bold text-black">{hubs.length + 18}</p>
             </div>
           </div>
           <div className="flex flex-col justify-between rounded-[28px] border-2 border-black/[0.04] bg-white p-5">

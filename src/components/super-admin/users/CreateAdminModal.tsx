@@ -1,10 +1,87 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Check, ChevronDown, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { ModalShell } from "@/components/orders/modals/ModalShell";
 import type { Hub } from "@/components/super-admin/users/usersData";
+
+function AssignWarehouseDropdown({
+  value,
+  onChange,
+  hubs,
+}: {
+  value: string;
+  onChange: (id: string) => void;
+  hubs: Hub[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = hubs.find((h) => h.id === value) ?? hubs[0];
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative mt-1.5" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
+          open
+            ? "border border-[#F7931E] bg-white ring-2 ring-[#F7931E]/20"
+            : "bg-[#F5F5F7] text-black hover:bg-[#EEEEEF]"
+        }`}
+      >
+        <span className="truncate">{selected?.name ?? "Select warehouse"}</span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-[#8E8E93] transition-transform duration-200 ${
+            open ? "rotate-180 text-[#F7931E]" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-30 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.14)]">
+          {hubs.map((hub) => {
+            const isSelected = hub.id === value;
+            return (
+              <button
+                key={hub.id}
+                type="button"
+                onClick={() => {
+                  onChange(hub.id);
+                  setOpen(false);
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-xs transition ${
+                  isSelected
+                    ? "bg-[#FFF8F0] text-[#F7931E]"
+                    : "text-black hover:bg-[#F5F5F7]"
+                }`}
+              >
+                <div className="min-w-0 pr-2">
+                  <p className={`font-semibold ${isSelected ? "text-[#F7931E]" : "text-black"}`}>
+                    {hub.name}
+                  </p>
+                  <p className="text-[11px] text-[#6B7280] truncate">{hub.address}</p>
+                </div>
+                {isSelected && <Check className="h-4 w-4 shrink-0 text-[#F7931E]" strokeWidth={2.5} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 type CreateAdminModalProps = {
   open: boolean;
@@ -108,17 +185,7 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
           </div>
           <div>
             <label className="text-sm font-semibold text-black">Assign to Warehouse</label>
-            <select
-              value={hubId}
-              onChange={(event) => setHubId(event.target.value)}
-              className="mt-1.5 w-full cursor-pointer rounded-xl bg-[#F5F5F7] px-4 py-3 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#F7931E]"
-            >
-              {hubs.map((hub) => (
-                <option key={hub.id} value={hub.id}>
-                  {hub.name}
-                </option>
-              ))}
-            </select>
+            <AssignWarehouseDropdown value={hubId} onChange={setHubId} hubs={hubs} />
           </div>
           {error && (
             <p className="text-center text-sm font-medium text-[#EF4444]">Please fill in all fields.</p>

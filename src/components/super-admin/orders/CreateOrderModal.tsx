@@ -7,9 +7,11 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  Mail,
   MapPin,
   Minus,
   Package,
+  Phone,
   Plus,
   Search,
   ShoppingCart,
@@ -47,6 +49,7 @@ type CreateOrderModalProps = {
 export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderModalProps) {
   // Mode: existing or new customer
   const [customerMode, setCustomerMode] = useState<"existing" | "new">("existing");
+  const [isSelectingCustomer, setIsSelectingCustomer] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>(CUSTOMERS[0]?.id ?? "");
 
@@ -93,6 +96,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
   useEffect(() => {
     if (!open) return;
     setCustomerMode("existing");
+    setIsSelectingCustomer(false);
     setCustomerSearch("");
     setSelectedCustomerId(CUSTOMERS[0]?.id ?? "");
     setNewCustomerName("");
@@ -393,103 +397,187 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
                 <label className="text-xs font-bold uppercase tracking-wider text-[#6E7B6A]">
                   1. Customer Information <span className="text-red-500">*</span>
                 </label>
-                <div className="inline-flex rounded-full bg-[#F5F5F7] p-0.5 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setCustomerMode("existing")}
-                    className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition ${
-                      customerMode === "existing"
-                        ? "bg-white text-[#1D1D1F] shadow-sm font-semibold"
-                        : "text-[#8E8E93] hover:text-[#1D1D1F]"
-                    }`}
-                  >
-                    <User className="h-3.5 w-3.5" />
-                    Existing Customer
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCustomerMode("new")}
-                    className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition ${
-                      customerMode === "new"
-                        ? "bg-white text-[#F7931E] shadow-sm font-semibold"
-                        : "text-[#8E8E93] hover:text-[#1D1D1F]"
-                    }`}
-                  >
-                    <UserPlus className="h-3.5 w-3.5" />
-                    + New Customer
-                  </button>
+                <div className="flex items-center gap-3">
+                  {customerMode === "existing" && selectedCustomer && !isSelectingCustomer && (
+                    <button
+                      type="button"
+                      onClick={() => setIsSelectingCustomer(true)}
+                      className="text-xs font-bold text-[#F7931E] hover:text-[#E08217] hover:underline transition cursor-pointer"
+                    >
+                      Change
+                    </button>
+                  )}
+                  {customerMode === "existing" && isSelectingCustomer && selectedCustomer && (
+                    <button
+                      type="button"
+                      onClick={() => setIsSelectingCustomer(false)}
+                      className="text-xs font-medium text-[#8E8E93] hover:text-[#1D1D1F] transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  <div className="inline-flex rounded-full bg-[#F5F5F7] p-0.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCustomerMode("existing");
+                        setIsSelectingCustomer(false);
+                      }}
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition ${
+                        customerMode === "existing"
+                          ? "bg-white text-[#1D1D1F] shadow-sm font-semibold"
+                          : "text-[#8E8E93] hover:text-[#1D1D1F]"
+                      }`}
+                    >
+                      <User className="h-3.5 w-3.5" />
+                      Existing Customer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCustomerMode("new")}
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-medium transition ${
+                        customerMode === "new"
+                          ? "bg-white text-[#F7931E] shadow-sm font-semibold"
+                          : "text-[#8E8E93] hover:text-[#1D1D1F]"
+                      }`}
+                    >
+                      <UserPlus className="h-3.5 w-3.5" />
+                      + New Customer
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {customerMode === "existing" ? (
-                <div className="space-y-3">
-                  <div className="relative">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
-                    <input
-                      type="text"
-                      placeholder="Search customer by name, email, or phone..."
-                      value={customerSearch}
-                      onChange={(e) => setCustomerSearch(e.target.value)}
-                      className="w-full rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] py-2.5 pl-10 pr-4 text-xs text-[#1D1D1F] placeholder-[#9CA3AF] focus:border-[#F7931E] focus:bg-white focus:outline-none transition"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-2 max-h-36 overflow-y-auto rounded-xl border border-[#E5E7EB] p-2 bg-[#FAFAFA]">
-                    {filteredCustomers.length === 0 ? (
-                      <div className="p-4 text-center">
-                        <p className="text-xs text-[#8E8E93]">No customer found with that query.</p>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCustomerMode("new");
-                            setNewCustomerName(customerSearch);
-                          }}
-                          className="mt-2 text-xs font-semibold text-[#F7931E] hover:underline"
-                        >
-                          + Create &ldquo;{customerSearch}&rdquo; as New Customer
-                        </button>
-                      </div>
-                    ) : (
-                      filteredCustomers.map((cust) => {
-                        const isSelected = cust.id === selectedCustomerId;
-                        return (
-                          <div
-                            key={cust.id}
-                            onClick={() => setSelectedCustomerId(cust.id)}
-                            className={`flex cursor-pointer items-center justify-between rounded-lg p-2.5 transition text-xs ${
-                              isSelected
-                                ? "bg-white border border-[#F7931E] shadow-sm ring-1 ring-[#F7931E]"
-                                : "hover:bg-white border border-transparent"
-                            }`}
-                          >
-                            <div className="min-w-0 pr-2">
-                              <p className="font-semibold text-[#1D1D1F] truncate">{cust.name}</p>
-                              <p className="text-[11px] text-[#6E7B6A] truncate">
-                                {cust.phone} • {cust.email}
-                              </p>
-                            </div>
-                            {isSelected && (
-                              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#F7931E]" />
-                            )}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-
-                  {selectedCustomer && (
-                    <div className="rounded-xl border border-[#EBEBEB] bg-[#FBFBFC] p-3 text-xs text-[#555]">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-[#1D1D1F]">Delivery Address:</span>
-                        <span className="text-[11px] text-[#8E8E93]">Prefilled from customer profile</span>
-                      </div>
-                      <p className="mt-1 flex items-start gap-1.5 text-[#374151]">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-[#F7931E] mt-0.5" />
-                        <span>{selectedCustomer.address}</span>
-                      </p>
+                isSelectingCustomer || !selectedCustomer ? (
+                  /* Customer Search & Select list */
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Search customer by name, email, or phone..."
+                        value={customerSearch}
+                        onChange={(e) => setCustomerSearch(e.target.value)}
+                        className="w-full rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] py-2.5 pl-10 pr-4 text-xs text-[#1D1D1F] placeholder-[#9CA3AF] focus:border-[#F7931E] focus:bg-white focus:outline-none transition"
+                      />
                     </div>
-                  )}
-                </div>
+
+                    <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto rounded-xl border border-[#E5E7EB] p-2 bg-[#FAFAFA]">
+                      {filteredCustomers.length === 0 ? (
+                        <div className="p-4 text-center">
+                          <p className="text-xs text-[#8E8E93]">No customer found with that query.</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCustomerMode("new");
+                              setNewCustomerName(customerSearch);
+                            }}
+                            className="mt-2 text-xs font-semibold text-[#F7931E] hover:underline"
+                          >
+                            + Create &ldquo;{customerSearch}&rdquo; as New Customer
+                          </button>
+                        </div>
+                      ) : (
+                        filteredCustomers.map((cust) => {
+                          const isSelected = cust.id === selectedCustomerId;
+                          return (
+                            <div
+                              key={cust.id}
+                              onClick={() => {
+                                setSelectedCustomerId(cust.id);
+                                setIsSelectingCustomer(false);
+                              }}
+                              className={`flex cursor-pointer items-center justify-between rounded-lg p-2.5 transition text-xs ${
+                                isSelected
+                                  ? "bg-white border border-[#F7931E] shadow-sm ring-1 ring-[#F7931E]"
+                                  : "hover:bg-white border border-transparent"
+                              }`}
+                            >
+                              <div className="min-w-0 pr-2">
+                                <p className="font-semibold text-[#1D1D1F] truncate">{cust.name}</p>
+                                <p className="text-[11px] text-[#6E7B6A] truncate">
+                                  {cust.phone} • {cust.email}
+                                </p>
+                              </div>
+                              {isSelected ? (
+                                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#F7931E]" />
+                              ) : (
+                                <span className="text-[11px] font-semibold text-[#F7931E]">Select</span>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Customer Info in Fields with Change text on the right */
+                  <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFAFA] p-4 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                          Customer Name
+                        </label>
+                        <div className="relative flex items-center">
+                          <User className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
+                          <input
+                            type="text"
+                            readOnly
+                            value={selectedCustomer.name}
+                            className="w-full rounded-xl border border-[#E5E7EB] bg-white py-2 pl-10 pr-3.5 text-xs font-medium text-[#1D1D1F] outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                          Phone Number
+                        </label>
+                        <div className="relative flex items-center">
+                          <Phone className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
+                          <input
+                            type="text"
+                            readOnly
+                            value={selectedCustomer.phone}
+                            className="w-full rounded-xl border border-[#E5E7EB] bg-white py-2 pl-10 pr-3.5 text-xs font-medium text-[#1D1D1F] outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                        Email Address
+                      </label>
+                      <div className="relative flex items-center">
+                        <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
+                        <input
+                          type="text"
+                          readOnly
+                          value={selectedCustomer.email}
+                          className="w-full rounded-xl border border-[#E5E7EB] bg-white py-2 pl-10 pr-3.5 text-xs font-medium text-[#1D1D1F] outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                        Primary Delivery Address
+                      </label>
+                      <div className="relative flex items-start">
+                        <MapPin className="pointer-events-none absolute left-3.5 top-2.5 h-4 w-4 text-[#F7931E]" />
+                        <textarea
+                          rows={2}
+                          readOnly
+                          value={selectedCustomer.address}
+                          className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-white py-2 pl-10 pr-3.5 text-xs font-medium leading-relaxed text-[#1D1D1F] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )
               ) : (
                 /* New Customer Form */
                 <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFAFA] p-4 space-y-3">
@@ -735,3 +823,4 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
     </ModalShell>
   );
 }
+

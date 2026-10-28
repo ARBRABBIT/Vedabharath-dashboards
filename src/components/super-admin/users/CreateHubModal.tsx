@@ -173,19 +173,24 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-black">Warehouse Capacity</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={capacity}
-                  onChange={(event) => {
-                    const onlyNums = event.target.value.replace(/\D/g, "");
-                    setCapacity(onlyNums);
-                  }}
-                  placeholder="e.g., 5000"
-                  className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-                />
+                <label className="text-sm font-semibold text-black">Warehouse Capacity (kg)</label>
+                <div className="relative mt-1.5 flex items-center">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={capacity}
+                    onChange={(event) => {
+                      const onlyNums = event.target.value.replace(/\D/g, "");
+                      setCapacity(onlyNums);
+                    }}
+                    placeholder="e.g., 5000"
+                    className="w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 pr-12 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                  />
+                  <span className="pointer-events-none absolute right-4 text-xs font-bold text-[#9CA3AF]">
+                    kg
+                  </span>
+                </div>
               </div>
 
               {/* Geo Tags & Coordinates */}

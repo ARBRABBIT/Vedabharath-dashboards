@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Compass, MapPin, Maximize2, Minus, Navigation, Plus, RotateCcw, Search, Warehouse, X } from "lucide-react";
+import { ArrowLeft, Check, Compass, MapPin, Maximize2, Minus, Navigation, Plus, RotateCcw, Search, Warehouse, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type WarehouseLocation = {
@@ -466,29 +466,40 @@ export function WarehouseLocationMapModal({
           >
             {/* Header */}
             <div className="flex items-center justify-between gap-4 border-b border-[#F3F4F6] px-6 py-4">
-              <div className="min-w-0">
-                <h3 className="text-lg font-bold text-black">Select Warehouse Location</h3>
-                <p className="text-xs text-[#6B7280]">
-                  Click anywhere on the map or search a hub to pin the distribution location.
-                </p>
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-black transition-colors hover:bg-[#F3F4F6]"
+                  title="Back"
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="h-5 w-5" strokeWidth={2} />
+                </button>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-black">Select Warehouse Location</h3>
+                  <p className="text-xs text-[#6B7280]">
+                    Click anywhere on the map or search a hub to pin the distribution location.
+                  </p>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 shrink-0">
-                {/* Search Bar */}
-                <div className="relative w-60 sm:w-72">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+                {/* Search Bar with increased height */}
+                <div className="relative w-64 sm:w-80">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search hub or location..."
-                    className="w-full rounded-full border border-[#E5E7EB] bg-white py-1.5 pl-9 pr-8 text-xs outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                    className="h-10 w-full rounded-full border border-[#E5E7EB] bg-white pl-10 pr-9 text-xs sm:text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery("")}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF] hover:text-black"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF] hover:text-black"
                     >
                       ✕
                     </button>
@@ -496,7 +507,7 @@ export function WarehouseLocationMapModal({
 
                   {/* Dropdown search suggestions */}
                   {searchResults.length > 0 && (
-                    <div className="absolute right-0 top-full z-30 mt-1.5 w-72 max-h-56 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-1.5 shadow-xl">
+                    <div className="absolute right-0 top-full z-30 mt-1.5 w-80 max-h-56 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-1.5 shadow-xl">
                       {searchResults.map((result) => (
                         <button
                           key={result.id}
@@ -530,7 +541,7 @@ export function WarehouseLocationMapModal({
             </div>
 
             {/* Map Canvas Viewport */}
-            <div className="relative h-[380px] w-full">
+            <div className="relative h-[310px] sm:h-[330px] w-full">
               <MapGraphic
                 pinLocation={{ x: activeLocation.x, y: activeLocation.y, name: activeLocation.name }}
                 onMapClick={handleMapClick}
@@ -575,14 +586,15 @@ export function WarehouseLocationMapModal({
               </div>
             </div>
 
-            {/* Bottom Bar with Location Details & "Confirm Warehouse Location" CTA */}
-            <div className="flex flex-col gap-4 border-t border-[#F3F4F6] bg-white p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FEF3E2] text-[#F7931E]">
-                  <MapPin className="h-6 w-6" strokeWidth={2.2} />
+            {/* Bottom Section with Location Details, Coordinates, Geo Tags & CTAs */}
+            <div className="border-t border-[#F3F4F6] bg-white px-6 py-4">
+              {/* Selected Location Details */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#FEF3E2] text-[#F7931E]">
+                  <MapPin className="h-5 w-5" strokeWidth={2.2} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-bold uppercase tracking-wide text-[#9CA3AF]">
+                  <p className="truncate text-[11px] font-bold uppercase tracking-wider text-[#9CA3AF]">
                     Selected Pin Location
                   </p>
                   <p className="truncate text-sm font-bold text-black">{activeLocation.name}</p>
@@ -590,7 +602,32 @@ export function WarehouseLocationMapModal({
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 shrink-0 ml-auto">
+              {/* Coordinates and Geo Tags Fields */}
+              <div className="mt-3.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-black">Coordinates</label>
+                  <input
+                    type="text"
+                    value={activeLocation.coordinates}
+                    onChange={(e) => setActiveLocation({ ...activeLocation, coordinates: e.target.value })}
+                    placeholder="e.g., 12.9850° N, 77.7400° E"
+                    className="mt-1 w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-3.5 py-2 text-xs text-black outline-none transition-colors focus:border-[#F7931E] focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-black">Geo Tags</label>
+                  <input
+                    type="text"
+                    value={activeLocation.geoTags}
+                    onChange={(e) => setActiveLocation({ ...activeLocation, geoTags: e.target.value })}
+                    placeholder="e.g., #Industrial, #Logistics"
+                    className="mt-1 w-full rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-3.5 py-2 text-xs text-black outline-none transition-colors focus:border-[#F7931E] focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Right-aligned CTAs */}
+              <div className="mt-4 flex items-center justify-end gap-3 border-t border-[#F3F4F6] pt-3.5">
                 <button
                   type="button"
                   onClick={onClose}

@@ -16,6 +16,8 @@ export type HubFormData = {
   zone: string;
   address: string;
   adminId: string;
+  coordinates?: string;
+  geoTags?: string;
 };
 
 type CreateHubModalProps = {
@@ -29,6 +31,8 @@ type CreateHubModalProps = {
 export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: CreateHubModalProps) {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [coordinates, setCoordinates] = useState("");
+  const [geoTags, setGeoTags] = useState("");
   const [adminId, setAdminId] = useState("");
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [error, setError] = useState(false);
@@ -37,7 +41,10 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
   useEffect(() => {
     if (!open) return;
     setName(initial?.name ?? "");
-    setAddress(initial?.facilityAddress ?? WAREHOUSE_PRESETS[0].fullAddress);
+    const defaultPreset = WAREHOUSE_PRESETS[0];
+    setAddress(initial?.facilityAddress ?? defaultPreset.fullAddress);
+    setCoordinates(defaultPreset.coordinates);
+    setGeoTags(defaultPreset.geoTags);
     setAdminId(admins.find((admin) => admin.hubId === initial?.id)?.id ?? "");
     setError(false);
     setStep("form");
@@ -59,7 +66,14 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
         ? "Hyderabad"
         : "Regional Hub";
 
-    onSave({ name: name.trim(), zone: zoneName, address: address.trim(), adminId });
+    onSave({
+      name: name.trim(),
+      zone: zoneName,
+      address: address.trim(),
+      adminId,
+      coordinates: coordinates.trim(),
+      geoTags: geoTags.trim(),
+    });
     setStep("success");
   }
 
@@ -152,6 +166,31 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
               </p>
             </div>
 
+            {/* Geo Tags & Coordinates */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-sm font-semibold text-black">Coordinates</label>
+                <input
+                  type="text"
+                  value={coordinates}
+                  onChange={(event) => setCoordinates(event.target.value)}
+                  placeholder="e.g., 12.9850° N, 77.7400° E"
+                  className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-black">Geo Tags</label>
+                <input
+                  type="text"
+                  value={geoTags}
+                  onChange={(event) => setGeoTags(event.target.value)}
+                  placeholder="e.g., #Industrial, #Logistics"
+                  className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
+                />
+              </div>
+            </div>
+
             {error && (
               <p className="rounded-xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#EF4444]">
                 Please fill in Hub Name and Full Address.
@@ -183,8 +222,10 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
         open={mapModalOpen}
         onClose={() => setMapModalOpen(false)}
         initialAddress={address}
-        onConfirmLocation={(confirmedAddr) => {
+        onConfirmLocation={(confirmedAddr, confirmedCoords, confirmedTags) => {
           setAddress(confirmedAddr);
+          if (confirmedCoords) setCoordinates(confirmedCoords);
+          if (confirmedTags) setGeoTags(confirmedTags);
           setError(false);
         }}
       />

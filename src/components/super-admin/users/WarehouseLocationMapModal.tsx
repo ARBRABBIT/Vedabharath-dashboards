@@ -10,6 +10,8 @@ export type WarehouseLocation = {
   area: string;
   city: string;
   fullAddress: string;
+  coordinates: string;
+  geoTags: string;
   x: number; // percentage (0-100)
   y: number; // percentage (0-100)
 };
@@ -21,6 +23,8 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     area: "KIADB Industrial Area, Phase 2",
     city: "Bangalore",
     fullAddress: "Plot 42, KIADB Industrial Area, Phase 2, Hoodi, Whitefield, Bangalore, Karnataka - 560066",
+    coordinates: "12.9850° N, 77.7400° E",
+    geoTags: "#EastBangalore, #IndustrialZone, #Tier1",
     x: 76,
     y: 38,
   },
@@ -30,6 +34,8 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     area: "Electronic City Phase 1",
     city: "Bangalore",
     fullAddress: "Survey No. 88, Electronic City Phase 1, Near Hosur Main Road, Bangalore, Karnataka - 560100",
+    coordinates: "12.8452° N, 77.6602° E",
+    geoTags: "#SouthBangalore, #TechCorridor, #ExpressHub",
     x: 65,
     y: 78,
   },
@@ -39,6 +45,8 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     area: "Peenya 4th Phase",
     city: "Bangalore",
     fullAddress: "Shed 15, Peenya 4th Phase, Industrial Estate, Bangalore, Karnataka - 560058",
+    coordinates: "13.0285° N, 77.5195° E",
+    geoTags: "#NorthBangalore, #IndustrialBelt, #HeavyLogistics",
     x: 24,
     y: 28,
   },
@@ -48,6 +56,8 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     area: "Financial District / Gachibowli",
     city: "Hyderabad",
     fullAddress: "Plot 12-B, Financial District, Nanakramguda, Gachibowli, Hyderabad, Telangana - 500032",
+    coordinates: "17.4401° N, 78.3489° E",
+    geoTags: "#Hyderabad, #FinancialDistrict, #MetroHub",
     x: 44,
     y: 48,
   },
@@ -57,6 +67,8 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     area: "Airport Cargo & Logistics Zone",
     city: "Hyderabad",
     fullAddress: "Survey 45/A, Shamshabad International Airport Cargo Zone, Hyderabad, Telangana - 500409",
+    coordinates: "17.2403° N, 78.4294° E",
+    geoTags: "#Hyderabad, #AirportCargo, #ExpressCargo",
     x: 52,
     y: 84,
   },
@@ -66,6 +78,8 @@ export const WAREHOUSE_PRESETS: WarehouseLocation[] = [
     area: "Bommasandra Industrial Area",
     city: "Bangalore",
     fullAddress: "Plot 104, 3rd Cross, Bommasandra Industrial Area, Anekal Taluk, Bangalore, Karnataka - 560099",
+    coordinates: "12.8123° N, 77.6890° E",
+    geoTags: "#Bangalore, #LogisticsPark, #Anekal",
     x: 82,
     y: 88,
   },
@@ -87,12 +101,19 @@ function getNearestOrCustomLocation(x: number, y: number): WarehouseLocation {
   const city = x > 50 ? "Bangalore" : "Hyderabad";
   const pin = x > 50 ? `5600${10 + sector}` : `5000${20 + sector}`;
 
+  const lat = (12.5 + (100 - y) * 0.05).toFixed(4);
+  const lng = (77.2 + x * 0.015).toFixed(4);
+  const coordinates = `${lat}° N, ${lng}° E`;
+  const geoTags = `#${city}, #${zoneName.replace(/\s+/g, "")}, #Sector${sector}`;
+
   return {
     id: `loc-${Math.round(x)}-${Math.round(y)}`,
     name: `Distribution Center (Sec ${sector})`,
     area: `${zoneName}, Block ${block}`,
     city,
     fullAddress: `Plot No. ${sector * 8 + block}, Sector ${sector}, ${zoneName}, ${city}, ${city === "Bangalore" ? "Karnataka" : "Telangana"} - ${pin}`,
+    coordinates,
+    geoTags,
     x: Math.round(x),
     y: Math.round(y),
   };
@@ -378,7 +399,7 @@ export function WarehouseLocationMapModal({
   open: boolean;
   onClose: () => void;
   initialAddress?: string;
-  onConfirmLocation: (address: string) => void;
+  onConfirmLocation: (address: string, coordinates?: string, geoTags?: string) => void;
 }) {
   const [activeLocation, setActiveLocation] = useState<WarehouseLocation>(() => {
     if (initialAddress) {
@@ -427,7 +448,7 @@ export function WarehouseLocationMapModal({
   }
 
   function handleConfirm() {
-    onConfirmLocation(activeLocation.fullAddress);
+    onConfirmLocation(activeLocation.fullAddress, activeLocation.coordinates, activeLocation.geoTags);
     onClose();
   }
 

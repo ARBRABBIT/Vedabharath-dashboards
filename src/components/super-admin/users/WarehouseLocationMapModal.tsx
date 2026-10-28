@@ -603,8 +603,8 @@ export function WarehouseLocationMapModal({
             </div>
 
             {/* Bottom Bar with Location Details & "Confirm Warehouse Location" CTA */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#F3F4F6] bg-white p-5 sm:px-6">
-              <div className="flex items-center gap-3 min-w-0 max-w-[520px]">
+            <div className="flex flex-col gap-4 border-t border-[#F3F4F6] bg-white p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FEF3E2] text-[#F7931E]">
                   <MapPin className="h-6 w-6" strokeWidth={2.2} />
                 </div>
@@ -617,18 +617,18 @@ export function WarehouseLocationMapModal({
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center justify-end gap-3 shrink-0 ml-auto">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="cursor-pointer rounded-full px-5 py-2.5 text-sm font-semibold text-[#6B7280] hover:text-black"
+                  className="cursor-pointer rounded-full border border-[#E5E7EB] bg-white px-6 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#F9FAFB] hover:text-black"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirm}
-                  className="flex cursor-pointer items-center gap-2 rounded-full bg-[#F7931E] px-7 py-3 text-sm font-bold text-white shadow-[0_4px_16px_rgba(247,147,30,0.35)] transition-all hover:bg-[#E68214] active:scale-95"
+                  className="flex cursor-pointer items-center gap-2 rounded-full bg-[#F7931E] px-7 py-2.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(247,147,30,0.35)] transition-all hover:bg-[#E68214] active:scale-95"
                 >
                   <Check className="h-4 w-4 stroke-[3]" />
                   Confirm Warehouse Location

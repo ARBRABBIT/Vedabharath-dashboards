@@ -7,10 +7,12 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  FileText,
   Mail,
   MapPin,
   Minus,
   Package,
+  Paperclip,
   Phone,
   Plus,
   Search,
@@ -268,6 +270,13 @@ export type OrderItemEntry = {
   qty: number;
 };
 
+export type PaymentAttachment = {
+  name: string;
+  size: string;
+  url: string;
+  isImage: boolean;
+};
+
 type CreateOrderModalProps = {
   open: boolean;
   onClose: () => void;
@@ -278,6 +287,7 @@ type CreateOrderModalProps = {
     items: OrderItemEntry[];
     total: number;
     paymentMethod: string;
+    paymentAttachment?: { name: string; size: string } | null;
   }) => void;
 };
 
@@ -299,6 +309,8 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
 
   // Payment method
   const [paymentMethod, setPaymentMethod] = useState("Prepaid (UPI)");
+  const [paymentAttachment, setPaymentAttachment] = useState<PaymentAttachment | null>(null);
+  const paymentFileInputRef = useRef<HTMLInputElement>(null);
 
   // Order Items (starts empty)
   const [items, setItems] = useState<OrderItemEntry[]>([]);
@@ -313,6 +325,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
     customerAddress: string;
     warehouse: string;
     total: number;
+    paymentAttachment?: string;
   } | null>(null);
 
   // Reset form when modal opens: everything starts completely empty
@@ -328,6 +341,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
     setNewCustomerAddress("");
     setSelectedWarehouse("");
     setPaymentMethod("Prepaid (UPI)");
+    setPaymentAttachment(null);
     setItems([]);
     setErrorMessage(null);
     setStep("form");
@@ -421,6 +435,31 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
     setItems((prev) => prev.filter((item) => item.id !== itemId));
   }
 
+  function handlePaymentFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const isImage = file.type.startsWith("image/");
+    const url = isImage ? URL.createObjectURL(file) : "";
+    const sizeKb = Math.round(file.size / 1024);
+    const sizeStr = sizeKb >= 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`;
+
+    setPaymentAttachment({
+      name: file.name,
+      size: sizeStr,
+      url,
+      isImage,
+    });
+    event.target.value = "";
+  }
+
+  function handleRemovePaymentAttachment() {
+    if (paymentAttachment?.url) {
+      URL.revokeObjectURL(paymentAttachment.url);
+    }
+    setPaymentAttachment(null);
+  }
+
   function handleCreateOrder() {
     setErrorMessage(null);
 
@@ -489,6 +528,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
       customerAddress: customerData.address,
       warehouse: selectedWarehouse,
       total: grandTotal,
+      paymentAttachment: paymentAttachment?.name,
     };
 
     setCreatedOrderSummary(summary);
@@ -502,6 +542,7 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
         items,
         total: grandTotal,
         paymentMethod,
+        paymentAttachment: paymentAttachment ? { name: paymentAttachment.name, size: paymentAttachment.size } : null,
       });
     }
   }
@@ -548,6 +589,19 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
                 <span className="text-[#8E8E93]">Total Amount:</span>
                 <span className="text-base font-bold text-[#1D1D1F]">₹{createdOrderSummary.total.toLocaleString()}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-[#8E8E93]">Payment Method:</span>
+                <span className="font-semibold text-[#1D1D1F]">{paymentMethod}</span>
+              </div>
+              {createdOrderSummary.paymentAttachment && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[#8E8E93]">Payment Proof:</span>
+                  <span className="flex items-center gap-1 font-semibold text-[#F7931E] truncate max-w-[200px]">
+                    <Paperclip className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{createdOrderSummary.paymentAttachment}</span>
+                  </span>
+                </div>
+              )}
               <div className="pt-2 border-t border-[#EAEAEA] text-[#71717A]">
                 <span className="font-medium text-[#1D1D1F]">Shipping Address:</span>{" "}
                 {createdOrderSummary.customerAddress}
@@ -978,29 +1032,96 @@ export function CreateOrderModal({ open, onClose, onOrderCreated }: CreateOrderM
               </div>
             </div>
 
-            {/* 4. Payment Method Selection */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#6E7B6A] mb-2">
-                4. Payment Method
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                {["Prepaid (UPI)", "Cash on Delivery (COD)", "Card / Net Banking"].map((method) => {
-                  const isSelected = paymentMethod === method;
-                  return (
+            {/* 4. Payment Method & Media Attachment */}
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#6E7B6A] mb-2">
+                  4. Payment Method
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                  {["Prepaid (UPI)", "Cash on Delivery (COD)", "Card / Net Banking"].map((method) => {
+                    const isSelected = paymentMethod === method;
+                    return (
+                      <button
+                        key={method}
+                        type="button"
+                        onClick={() => setPaymentMethod(method)}
+                        className={`rounded-xl border py-2 px-3 text-left font-medium transition ${
+                          isSelected
+                            ? "border-[#F7931E] bg-[#FFF8F0] text-[#F7931E] font-semibold"
+                            : "border-[#E5E7EB] bg-[#FAFAFA] text-[#6E7B6A] hover:bg-white"
+                        }`}
+                      >
+                        {method}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Payment Proof / Media Attachment */}
+              <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFAFA] p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-semibold text-[#374151] flex items-center gap-1.5">
+                    <Paperclip className="h-3.5 w-3.5 text-[#F7931E]" />
+                    Payment Proof / Receipt Attachment
+                  </label>
+                  <span className="text-[10px] text-[#8E8E93]">Optional • PNG, JPG, PDF up to 10MB</span>
+                </div>
+
+                <input
+                  ref={paymentFileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,application/pdf"
+                  className="hidden"
+                  onChange={handlePaymentFileChange}
+                />
+
+                {paymentAttachment ? (
+                  <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-white p-2.5 text-xs shadow-sm">
+                    <div className="flex items-center gap-3 min-w-0 pr-2">
+                      {paymentAttachment.isImage && paymentAttachment.url ? (
+                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-[#E5E7EB] bg-[#F5F5F7]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={paymentAttachment.url}
+                            alt="Payment receipt preview"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#FFF6EE] text-[#F7931E]">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-[#1D1D1F]">{paymentAttachment.name}</p>
+                        <p className="text-[11px] text-[#22C55E] font-medium flex items-center gap-1">
+                          <Check className="h-3 w-3 stroke-[2.5]" />
+                          {paymentAttachment.size} • Attached
+                        </p>
+                      </div>
+                    </div>
+
                     <button
-                      key={method}
                       type="button"
-                      onClick={() => setPaymentMethod(method)}
-                      className={`rounded-xl border py-2 px-3 text-left font-medium transition ${
-                        isSelected
-                          ? "border-[#F7931E] bg-[#FFF8F0] text-[#F7931E] font-semibold"
-                          : "border-[#E5E7EB] bg-[#FAFAFA] text-[#6E7B6A] hover:bg-white"
-                      }`}
+                      onClick={handleRemovePaymentAttachment}
+                      aria-label="Remove payment proof"
+                      className="p-1.5 text-[#9CA3AF] hover:text-red-500 rounded-lg hover:bg-[#F5F5F7] transition cursor-pointer"
                     >
-                      {method}
+                      <Trash2 className="h-4 w-4" />
                     </button>
-                  );
-                })}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => paymentFileInputRef.current?.click()}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#D1D5DB] bg-white py-2.5 px-4 text-xs font-semibold text-[#6E7B6A] transition hover:border-[#F7931E] hover:bg-[#FFFDFB] hover:text-[#F7931E]"
+                  >
+                    <Paperclip className="h-3.5 w-3.5 text-[#8E8E93]" />
+                    <span>Upload Payment Proof / Screenshot</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -351,14 +351,6 @@ export function WarehouseMapInlinePicker({
       <div className="relative h-[160px] w-full" onClick={onOpenEnlarge}>
         <MapGraphic pinLocation={{ x: location.x, y: location.y, name: location.name }} showLabels={false} />
 
-        {/* Top Floating Controls */}
-        <div className="absolute left-3 top-3 flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-black shadow-sm backdrop-blur-md">
-            <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-            Warehouse Location
-          </span>
-        </div>
-
         {/* Top-Right Enlarge CTA Button */}
         <div className="absolute right-3 top-3">
           <button
@@ -367,10 +359,11 @@ export function WarehouseMapInlinePicker({
               e.stopPropagation();
               onOpenEnlarge();
             }}
-            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#1F2937] shadow-md backdrop-blur-md transition-all hover:bg-white hover:text-[#F7931E] hover:scale-105 active:scale-95"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/95 text-[#1F2937] shadow-md backdrop-blur-md transition-all hover:bg-white hover:text-[#F7931E] hover:scale-105 active:scale-95"
+            title="Enlarge Map"
+            aria-label="Enlarge Map"
           >
-            <Maximize2 className="h-3.5 w-3.5" strokeWidth={2.2} />
-            Enlarge Map
+            <Maximize2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
         </div>
 

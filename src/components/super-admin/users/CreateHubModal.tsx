@@ -136,16 +136,7 @@ export function CreateHubModal({ open, onClose, initial, admins = [], onSave }: 
 
             {/* Warehouse Map Location Picker */}
             <div>
-              <div className="flex items-center justify-between pb-1.5">
-                <label className="text-sm font-semibold text-black">Warehouse Location on Map</label>
-                <button
-                  type="button"
-                  onClick={() => setMapModalOpen(true)}
-                  className="cursor-pointer text-xs font-bold text-[#F7931E] transition-colors hover:underline"
-                >
-                  Enlarge Map
-                </button>
-              </div>
+              <label className="block text-sm font-semibold text-black pb-1.5">Warehouse Location on Map</label>
               <WarehouseMapInlinePicker
                 selectedAddress={address}
                 onOpenEnlarge={() => setMapModalOpen(true)}

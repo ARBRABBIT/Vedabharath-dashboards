@@ -123,7 +123,7 @@ export default function HighPerformingHubsPage() {
                 {topHub?.name.replace(" Distribution Warehouse", "").replace(" Distribution Hub", "")}
               </p>
               <p className="mt-0.5 text-xs text-[#6B7280]">
-                {topHub?.stockCapacityPercent}% Capacity · {topHub?.dailyOrderVolume}/day
+                {topHub?.stockCapacityPercent}% Stock Capacity
               </p>
             </div>
           </div>
@@ -196,7 +196,6 @@ export default function HighPerformingHubsPage() {
                     <th className="px-6 py-4">Rank</th>
                     <th className="px-4 py-4">Warehouse Name & Location</th>
                     <th className="px-4 py-4">Stock Capacity</th>
-                    <th className="px-4 py-4">Daily Volume</th>
                     <th className="px-4 py-4">Highly Ordered</th>
                     <th className="px-4 py-4">Admins</th>
                     <th className="px-6 py-4 text-right">Action</th>
@@ -205,7 +204,7 @@ export default function HighPerformingHubsPage() {
                 <tbody>
                   {filteredHubs.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#9CA3AF]">
+                      <td colSpan={6} className="px-6 py-12 text-center text-sm text-[#9CA3AF]">
                         No distribution warehouses match your search.
                       </td>
                     </tr>
@@ -273,11 +272,6 @@ export default function HighPerformingHubsPage() {
                               {hub.stockCapacityPercent}%
                             </span>
                           </div>
-                        </td>
-
-                        {/* Daily Order Volume */}
-                        <td className="px-4 py-4 text-sm font-semibold text-black">
-                          {hub.dailyOrderVolume}
                         </td>
 
                         {/* Highly Ordered */}
@@ -357,7 +351,7 @@ export default function HighPerformingHubsPage() {
                     </div>
 
                     {/* Stats mini grid */}
-                    <div className="mt-5 grid grid-cols-3 gap-2">
+                    <div className="mt-5 grid grid-cols-2 gap-3">
                       <div className="rounded-xl bg-[#F9FAFB] p-2.5 text-center">
                         <p className="text-[10px] font-bold uppercase tracking-wide text-[#86868B]">
                           Capacity
@@ -365,12 +359,6 @@ export default function HighPerformingHubsPage() {
                         <p className="mt-1 text-sm font-bold text-black">
                           {hub.stockCapacityPercent}%
                         </p>
-                      </div>
-                      <div className="rounded-xl bg-[#F9FAFB] p-2.5 text-center">
-                        <p className="text-[10px] font-bold uppercase tracking-wide text-[#86868B]">
-                          Daily Vol
-                        </p>
-                        <p className="mt-1 text-sm font-bold text-black">{hub.dailyOrderVolume}</p>
                       </div>
                       <div className="rounded-xl bg-[#F9FAFB] p-2.5 text-center">
                         <p className="text-[10px] font-bold uppercase tracking-wide text-[#86868B]">

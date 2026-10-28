@@ -12,6 +12,7 @@ export const PROFILE = {
   email: "sriraj455@vedabharath.com",
   phone: "+91 98765 43210",
   role: "Operations Lead",
+  assignedWarehouse: "Gachibowli Distribution Warehouse",
   status: "Active",
 };
 
@@ -19,6 +20,7 @@ type ProfileModalProps = {
   open: boolean;
   onClose: () => void;
   onRequestLogout: () => void;
+  warehouseName?: string;
 };
 
 function ProfileField({ label, value }: { label: string; value: ReactNode }) {
@@ -32,7 +34,7 @@ function ProfileField({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-export function ProfileModal({ open, onClose, onRequestLogout }: ProfileModalProps) {
+export function ProfileModal({ open, onClose, onRequestLogout, warehouseName }: ProfileModalProps) {
   useEffect(() => {
     if (!open) return;
 
@@ -68,7 +70,7 @@ export function ProfileModal({ open, onClose, onRequestLogout }: ProfileModalPro
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             onClick={(event) => event.stopPropagation()}
-            className="relative w-full max-w-[500px] rounded-[18px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04)]"
+            className="relative w-full max-w-[500px] overflow-hidden rounded-[24px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04)]"
           >
             <button
               type="button"
@@ -93,14 +95,25 @@ export function ProfileModal({ open, onClose, onRequestLogout }: ProfileModalPro
               <ProfileField label="Email Address" value={PROFILE.email} />
               <ProfileField label="Phone Number" value={PROFILE.phone} />
               <ProfileField label="Assigned Role" value={PROFILE.role} />
-              <ProfileField
-                label="Account Status"
-                value={
-                  <span className="inline-flex w-fit items-center rounded-full bg-[#EBF7EC] px-2 py-0.5 text-xs font-bold text-[#3BB54A]">
-                    {PROFILE.status}
-                  </span>
-                }
-              />
+              {PROFILE.role === "Operations Lead" ? (
+                <ProfileField
+                  label="Assigned Warehouse"
+                  value={
+                    <span className="text-sm font-semibold text-[#171D15] leading-snug">
+                      {warehouseName ?? PROFILE.assignedWarehouse}
+                    </span>
+                  }
+                />
+              ) : (
+                <ProfileField
+                  label="Account Status"
+                  value={
+                    <span className="inline-flex w-fit items-center rounded-full bg-[#EBF7EC] px-2 py-0.5 text-xs font-bold text-[#3BB54A]">
+                      {PROFILE.status}
+                    </span>
+                  }
+                />
+              )}
             </div>
 
             <div className="border-t border-[#E5E5E7] px-8 py-5">

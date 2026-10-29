@@ -87,12 +87,13 @@ type CreateAdminModalProps = {
   open: boolean;
   onClose: () => void;
   hubs: Hub[];
-  onCreate: (data: { name: string; email: string; hubId: string }) => void;
+  onCreate: (data: { name: string; email: string; phone: string; hubId: string }) => void;
 };
 
 export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [hubId, setHubId] = useState(hubs[0]?.id ?? "");
   const [error, setError] = useState(false);
   const [step, setStep] = useState<"form" | "success">("form");
@@ -101,6 +102,7 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
     if (!open) return;
     setName("");
     setEmail("");
+    setPhone("");
     setHubId(hubs[0]?.id ?? "");
     setError(false);
     setStep("form");
@@ -108,11 +110,13 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
   }, [open]);
 
   function handleCreate() {
-    if (!name.trim() || !email.trim() || !hubId) {
+    const cleanPhone = phone.trim();
+    if (!name.trim() || !email.trim() || cleanPhone.length < 10 || !hubId) {
       setError(true);
       return;
     }
-    onCreate({ name: name.trim(), email: email.trim(), hubId });
+    const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
+    onCreate({ name: name.trim(), email: email.trim(), phone: formattedPhone, hubId });
     setStep("success");
   }
 
@@ -184,11 +188,34 @@ export function CreateAdminModal({ open, onClose, hubs, onCreate }: CreateAdminM
             />
           </div>
           <div>
+            <label className="text-xs font-bold uppercase tracking-wide text-[#374151]">Phone Number</label>
+            <div className="mt-1.5 flex items-center rounded-xl bg-[#F5F5F7] px-4 py-3 transition focus-within:bg-white focus-within:ring-2 focus-within:ring-[#F7931E]">
+              <span className="shrink-0 border-r border-[#E5E5E7] pr-3 text-sm font-semibold text-[#171D15]">
+                +91
+              </span>
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
+                autoComplete="off"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value.replace(/[^0-9]/g, "").slice(0, 10))}
+                placeholder="98765 43210"
+                className="w-full min-w-0 bg-transparent pl-3 text-sm outline-none placeholder:text-[#9CA3AF]"
+              />
+            </div>
+          </div>
+          <div>
             <label className="text-sm font-semibold text-black">Assign to Warehouse</label>
             <AssignWarehouseDropdown value={hubId} onChange={setHubId} hubs={hubs} />
           </div>
           {error && (
-            <p className="text-center text-sm font-medium text-[#EF4444]">Please fill in all fields.</p>
+            <p className="text-center text-sm font-medium text-[#EF4444]">
+              {phone.trim().length > 0 && phone.trim().length < 10
+                ? "Please enter a valid 10-digit phone number."
+                : "Please fill in all fields."}
+            </p>
           )}
         </div>
 

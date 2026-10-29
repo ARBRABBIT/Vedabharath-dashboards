@@ -93,10 +93,10 @@ export default function UserManagementPage() {
     }
   }
 
-  function handleCreateAdmin(data: { name: string; email: string; hubId: string }) {
+  function handleCreateAdmin(data: { name: string; email: string; phone: string; hubId: string }) {
     setAdmins((prev) => [
       ...prev,
-      { id: `adm-${prev.length + 1}`, name: data.name, role: "Warehouse Admin", email: data.email, phone: "+91 90000 00000", hubId: data.hubId, status: "Active" },
+      { id: `adm-${prev.length + 1}`, name: data.name, role: "Warehouse Admin", email: data.email, phone: data.phone || "+91 90000 00000", hubId: data.hubId, status: "Active" },
     ]);
   }
 

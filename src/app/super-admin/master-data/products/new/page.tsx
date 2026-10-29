@@ -1,14 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, ChevronDown, ChevronLeft, ChevronRight, Droplet, Heart, Lightbulb, Plus, ShieldCheck, Star, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronLeft, ChevronRight, Droplet, Heart, Lightbulb, Plus, Search, ShieldCheck, Star, Tag, Trash2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SuperAdminNavbar } from "@/components/dashboard/SuperAdminNavbar";
 import { HealthBenefitsPickerModal } from "@/components/super-admin/masterdata/HealthBenefitsPickerModal";
 import {
   HEALTH_BENEFIT_LIBRARY,
+  INITIAL_TAGS,
   NUTRIENT_LIBRARY,
   TESTIMONIAL_LIBRARY,
 } from "@/components/super-admin/masterdata/masterDataData";
@@ -32,6 +33,178 @@ const PREVIEW_BADGES = [
   { icon: Heart, iconBg: "bg-[#FEF3E2]", iconColor: "text-[#F7931E]", label: "Diabetic Friendly" },
   { icon: ShieldCheck, iconBg: "bg-[#EBF7EC]", iconColor: "text-[#22C55E]", label: "High Fiber" },
 ];
+
+function ProductTagDropdown({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (tag: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  const baseTags = useMemo(() => {
+    const list = [
+      "Trending",
+      "Best Seller",
+      "Organic",
+      "Healthy Choice",
+      "Top Rated",
+      "Premium",
+      "Limited Edition",
+      "Heritage Rice",
+      "Lowest Ever",
+      "Most Selling",
+      ...INITIAL_TAGS.map((t) => t.name),
+    ];
+    return Array.from(new Set(list));
+  }, []);
+
+  const [customTags, setCustomTags] = useState<string[]>([]);
+
+  const allTags = useMemo(() => {
+    const combined = [...baseTags, ...customTags];
+    if (value && !combined.includes(value)) {
+      combined.push(value);
+    }
+    return Array.from(new Set(combined));
+  }, [baseTags, customTags, value]);
+
+  const filteredTags = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return allTags;
+    return allTags.filter((t) => t.toLowerCase().includes(q));
+  }, [allTags, search]);
+
+  const canAddCustom =
+    search.trim().length > 0 &&
+    !allTags.some((t) => t.toLowerCase() === search.trim().toLowerCase());
+
+  useEffect(() => {
+    if (!open) {
+      setSearch("");
+      return;
+    }
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative mt-1.5" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex h-[42px] w-full cursor-pointer items-center justify-between rounded-xl border bg-white px-4 text-left text-sm transition ${
+          open
+            ? "border-[#F7931E] ring-2 ring-[#F7931E]/20"
+            : "border-[#E5E7EB] hover:border-[#D1D5DB]"
+        }`}
+      >
+        <span className="flex items-center gap-2 truncate">
+          {value ? (
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#FFF8F0] px-2.5 py-1 text-xs font-semibold text-[#F7931E]">
+              <Tag className="h-3 w-3" />
+              {value}
+            </span>
+          ) : (
+            <span className="text-[#9CA3AF]">Select product tag (e.g. Trending)</span>
+          )}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-[#8E8E93] transition-transform duration-200 ${
+            open ? "rotate-180 text-[#F7931E]" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-30 mt-1.5 flex max-h-64 flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-[0_16px_40px_rgba(0,0,0,0.14)]">
+          <div className="relative mb-2 shrink-0">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9CA3AF]" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search or type a new tag..."
+              className="w-full rounded-xl bg-[#F5F5F7] py-2 pl-8 pr-3 text-xs outline-none placeholder:text-[#9CA3AF] focus:ring-1 focus:ring-[#F7931E]"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
+            {canAddCustom && (
+              <button
+                type="button"
+                onClick={() => {
+                  const newTag = search.trim();
+                  setCustomTags((prev) => [...prev, newTag]);
+                  onChange(newTag);
+                  setSearch("");
+                  setOpen(false);
+                }}
+                className="flex w-full cursor-pointer items-center gap-2 rounded-xl bg-[#FFF8F0] px-3 py-2 text-left text-xs font-semibold text-[#F7931E] transition hover:bg-[#FEEFD9]"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add &ldquo;{search.trim()}&rdquo; as new tag
+              </button>
+            )}
+
+            {filteredTags.map((tag) => {
+              const isSelected = value === tag;
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => {
+                    onChange(isSelected ? "" : tag);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition ${
+                    isSelected
+                      ? "bg-[#FFF8F0] font-semibold text-[#F7931E]"
+                      : "text-black hover:bg-[#F5F5F7]"
+                  }`}
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    <Tag className={`h-3 w-3 ${isSelected ? "text-[#F7931E]" : "text-[#9CA3AF]"}`} />
+                    {tag}
+                  </span>
+                  {isSelected && <Check className="h-3.5 w-3.5 text-[#F7931E]" strokeWidth={2.5} />}
+                </button>
+              );
+            })}
+
+            {filteredTags.length === 0 && !canAddCustom && (
+              <p className="py-3 text-center text-xs text-[#9CA3AF]">No tags found</p>
+            )}
+          </div>
+
+          {value && (
+            <div className="mt-1 shrink-0 border-t border-[#F3F4F6] pt-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  onChange("");
+                  setOpen(false);
+                }}
+                className="w-full cursor-pointer py-1 text-center text-[11px] font-medium text-[#EF4444] transition hover:underline"
+              >
+                Clear selection
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AddNewProductPage() {
   const router = useRouter();
@@ -177,7 +350,15 @@ export default function AddNewProductPage() {
                 </div>
 
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-black">{productName || "Navara Rice"}</h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-2xl font-bold text-black">{productName || "Navara Rice"}</h2>
+                    {productTag && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-0.5 text-xs font-semibold text-[#F7931E]">
+                        <Tag className="h-3 w-3" />
+                        {productTag}
+                      </span>
+                    )}
+                  </div>
                   <div className="mt-1 flex items-center gap-1.5 text-sm text-[#6B7280]">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <Star key={index} className="h-3.5 w-3.5 fill-[#F7931E] text-[#F7931E]" strokeWidth={0} />
@@ -390,14 +571,8 @@ export default function AddNewProductPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-black">Products Tag</label>
-                  <input
-                    type="text"
-                    value={productTag}
-                    onChange={(event) => setProductTag(event.target.value)}
-                    placeholder="e.g Trending"
-                    className="mt-1.5 w-full rounded-xl border border-[#E5E7EB] px-4 py-2.5 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#F7931E]"
-                  />
+                  <label className="text-sm font-semibold text-black">Product Tag</label>
+                  <ProductTagDropdown value={productTag} onChange={setProductTag} />
                 </div>
               </div>
 
